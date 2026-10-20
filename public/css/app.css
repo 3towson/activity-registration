@@ -1,0 +1,653 @@
+/*
+ * app.css — สไตล์ของทั้งเว็บ (เขียนเอง ไม่ใช้ CSS framework)
+ * โหลดใน layouts/main.blade.php ที่เดียว ทุกหน้าจึงใช้สไตล์เดียวกัน
+ * เจ้าของ: คนที่ 2 — ถ้าต้องการ class ใหม่ ให้บอกคนที่ 2
+ *
+ * ชื่อ class ตามแบบในคาบ:
+ *   app-cmp-*  = component (ชิ้นส่วนของหน้า เช่น app-cmp-data-list)
+ *   app-cl-*   = class เสริม (เช่น app-cl-danger, app-cl-number)
+ */
+
+/* ---------- 1. ตัวแปรสี / ขนาด ---------- */
+:root {
+    --c-ink: #1d2a2e;
+    --c-muted: #5b6b70;
+    --c-line: #dfe3dc;
+    --c-paper: #f6f4ee;
+    --c-surface: #ffffff;
+    --c-primary: #0f5c63;
+    --c-primary-dark: #0a4449;
+    --c-primary-soft: #e3f0ef;
+    --c-accent: #e8a33d;
+    --c-accent-soft: #fbe9c9;
+
+    --c-ok: #1f7a4d;
+    --c-ok-soft: #e2f3e9;
+    --c-error: #b42318;
+    --c-error-soft: #fde8e6;
+
+    --radius: 10px;
+    --shadow: 0 1px 2px rgb(16 40 44 / 6%), 0 4px 16px rgb(16 40 44 / 6%);
+    --font: 'IBM Plex Sans Thai', 'Sarabun', 'Tahoma', sans-serif;
+}
+
+/* ---------- 2. พื้นฐาน ---------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--c-paper);
+    color: var(--c-ink);
+    font-family: var(--font);
+    line-height: 1.6;
+}
+
+a {
+    color: var(--c-primary);
+    text-underline-offset: 3px;
+}
+
+a:hover {
+    color: var(--c-primary-dark);
+}
+
+h1,
+h2,
+h3 {
+    line-height: 1.3;
+    margin: 0;
+}
+
+small {
+    color: var(--c-muted);
+}
+
+/* ---------- 3. Header + เมนูหลัก ---------- */
+#app-main-header {
+    background: var(--c-primary);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 12%);
+}
+
+.app-cmp-header-bar {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0.6rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.app-cmp-brand {
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.15rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.app-cmp-brand:hover {
+    color: var(--c-accent-soft);
+}
+
+.app-cmp-brand-mark {
+    color: var(--c-accent);
+}
+
+.app-cmp-main-nav {
+    flex: 1;
+}
+
+.app-cmp-main-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.app-cmp-main-nav a {
+    display: block;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    color: #d6ebe9;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.app-cmp-main-nav a:hover {
+    color: #fff;
+    background: rgb(255 255 255 / 10%);
+}
+
+.app-cmp-main-nav a.active {
+    color: var(--c-primary-dark);
+    background: #fff;
+}
+
+.app-cmp-user-panel {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.app-cmp-user-name {
+    font-weight: 500;
+}
+
+.app-cmp-role {
+    display: inline-block;
+    margin-left: 0.25rem;
+    padding: 0 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    background: rgb(255 255 255 / 18%);
+}
+
+.app-cmp-role.app-cl-admin {
+    background: var(--c-accent);
+    color: var(--c-ink);
+}
+
+#app-main-header .app-cl-ghost {
+    color: #fff;
+    border-color: rgb(255 255 255 / 45%);
+}
+
+#app-main-header .app-cl-ghost:hover {
+    background: rgb(255 255 255 / 12%);
+}
+
+#app-main-header .app-cl-button {
+    background: var(--c-accent);
+    border-color: var(--c-accent);
+    color: var(--c-ink);
+}
+
+/* ---------- 4. เนื้อหาหลัก ---------- */
+#app-main-content {
+    flex: 1;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 3rem;
+}
+
+.app-cmp-content-header {
+    margin-bottom: 1.5rem;
+}
+
+.app-cmp-content-header > h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.app-cmp-lead {
+    font-size: 1.1rem;
+    color: var(--c-muted);
+    max-width: 48rem;
+    margin: 0 0 1rem;
+}
+
+#app-main-footer {
+    text-align: center;
+    color: var(--c-muted);
+    font-size: 0.85rem;
+    padding: 1.25rem;
+    border-top: 1px solid var(--c-line);
+}
+
+/* ---------- 5. ข้อความแจ้งเตือน (session) ---------- */
+.app-cmp-notifications:empty {
+    display: none;
+}
+
+.app-cmp-notifications {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+[role='status'],
+[role='alert'] {
+    padding: 0.7rem 1rem 0.7rem 2.6rem;
+    border-radius: var(--radius);
+    border: 1px solid;
+    position: relative;
+    font-weight: 500;
+}
+
+[role='status']::before,
+[role='alert']::before {
+    position: absolute;
+    left: 0.9rem;
+    font-weight: 700;
+}
+
+/* สำเร็จ = เขียว */
+[role='status'] {
+    background: var(--c-ok-soft);
+    border-color: #a7dcc0;
+    color: var(--c-ok);
+}
+
+[role='status']::before {
+    content: '✓';
+}
+
+/* ผิดพลาด = แดง */
+[role='alert'] {
+    background: var(--c-error-soft);
+    border-color: #f5b8b2;
+    color: var(--c-error);
+}
+
+[role='alert']::before {
+    content: '!';
+}
+
+/* ---------- 6. ปุ่ม / ลิงก์แบบปุ่ม ---------- */
+button,
+.app-cl-button,
+.app-cl-ghost,
+.app-cmp-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--c-primary);
+    background: var(--c-primary);
+    color: #fff;
+    font: inherit;
+    font-weight: 500;
+    line-height: 1.4;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+button:hover,
+.app-cl-button:hover,
+.app-cmp-links a:hover {
+    background: var(--c-primary-dark);
+    border-color: var(--c-primary-dark);
+    color: #fff;
+}
+
+.app-cl-ghost,
+.app-cmp-links a.app-cl-ghost {
+    background: transparent;
+    color: var(--c-primary);
+}
+
+.app-cl-ghost:hover,
+.app-cmp-links a.app-cl-ghost:hover {
+    background: var(--c-primary-soft);
+    color: var(--c-primary-dark);
+}
+
+.app-cl-danger,
+button.app-cl-danger {
+    background: var(--c-surface);
+    border-color: var(--c-error);
+    color: var(--c-error);
+}
+
+button.app-cl-danger:hover {
+    background: var(--c-error);
+    border-color: var(--c-error);
+    color: #fff;
+}
+
+.app-cl-block {
+    display: flex;
+    width: 100%;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid var(--c-accent);
+    outline-offset: 2px;
+}
+
+/* ---------- 7. แถบลิงก์ + pagination ---------- */
+.app-cmp-links-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.app-cmp-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.app-cmp-links form {
+    display: none; /* ฟอร์มว่างสำหรับปุ่ม form="..." */
+}
+
+/* pagination::semantic-ui ของ Laravel */
+.ui.pagination.menu {
+    display: inline-flex;
+    border: 1px solid var(--c-line);
+    border-radius: 8px;
+    background: var(--c-surface);
+    overflow: hidden;
+}
+
+.ui.pagination.menu .item {
+    min-width: 2.4rem;
+    padding: 0.35rem 0.7rem;
+    text-align: center;
+    text-decoration: none;
+    color: var(--c-ink);
+    border-left: 1px solid var(--c-line);
+}
+
+.ui.pagination.menu .item:first-child {
+    border-left: 0;
+}
+
+.ui.pagination.menu .item:hover {
+    background: var(--c-primary-soft);
+}
+
+.ui.pagination.menu .item.active {
+    background: var(--c-primary);
+    color: #fff;
+    font-weight: 600;
+}
+
+.ui.pagination.menu .item.disabled {
+    color: #b4bdbf;
+    pointer-events: none;
+}
+
+.ui.pagination.menu .left.chevron.icon::before {
+    content: '‹';
+    font-style: normal;
+}
+
+.ui.pagination.menu .right.chevron.icon::before {
+    content: '›';
+    font-style: normal;
+}
+
+/* ---------- 8. ฟอร์มค้นหา ---------- */
+.app-cmp-search-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem 1rem;
+    flex-wrap: wrap;
+    padding: 1rem;
+    background: var(--c-surface);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius);
+}
+
+.app-cmp-search-form label {
+    display: grid;
+    gap: 0.2rem;
+    font-size: 0.85rem;
+    color: var(--c-muted);
+}
+
+.app-cmp-search-form label:first-child {
+    flex: 1 1 18rem;
+}
+
+.app-cmp-search-form .app-cmp-check {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding-bottom: 0.55rem;
+    color: var(--c-ink);
+}
+
+.app-cmp-search-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ---------- 9. ช่องกรอกข้อมูล ---------- */
+input[type='text'],
+input[type='search'],
+input[type='email'],
+input[type='password'],
+input[type='number'],
+input[type='date'],
+select,
+textarea {
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid #c9d0cb;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--c-ink);
+    font: inherit;
+}
+
+input[type='number'] {
+    text-align: right;
+}
+
+textarea {
+    resize: vertical;
+}
+
+input[type='checkbox'] {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--c-primary);
+}
+
+/* ---------- 10. ฟอร์มสร้าง/แก้ไข ---------- */
+.app-cmp-form {
+    max-width: 52rem;
+    padding: 1.5rem;
+    background: var(--c-surface);
+    border: 1px solid var(--c-line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.app-cmp-auth-form {
+    max-width: 26rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.app-cmp-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.25rem;
+}
+
+.app-cmp-form label {
+    display: grid;
+    gap: 0.25rem;
+    align-content: start;
+}
+
+.app-cmp-form label > span {
+    font-weight: 500;
+    font-size: 0.92rem;
+}
+
+.app-cmp-form label > span b {
+    color: var(--c-error);
+}
+
+.app-cl-wide {
+    grid-column: 1 / -1;
+}
+
+.app-cmp-field-error {
+    color: var(--c-error);
+    font-weight: 500;
+}
+
+.app-cmp-field-hint {
+    color: var(--c-muted);
+}
+
+.app-cmp-form-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+}
+
+.app-cmp-auth-form .app-cmp-form-actions {
+    margin-top: 0.25rem;
+}
+
+/* ---------- 11. ตารางรายการ ---------- */
+.app-cmp-data-list {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--c-surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.app-cmp-data-list caption {
+    text-align: left;
+    padding: 0 0 0.5rem;
+    color: var(--c-muted);
+    font-size: 0.9rem;
+}
+
+.app-cmp-data-list th,
+.app-cmp-data-list td {
+    padding: 0.65rem 0.9rem;
+    text-align: left;
+    border-bottom: 1px solid var(--c-line);
+}
+
+.app-cmp-data-list thead th {
+    background: #eef1ec;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--c-muted);
+}
+
+.app-cmp-data-list tbody tr:last-child > * {
+    border-bottom: 0;
+}
+
+.app-cmp-data-list tbody tr:hover {
+    background: #fafbf8;
+}
+
+.app-cmp-data-list tbody th a {
+    font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.app-cl-number {
+    text-align: right !important;
+    font-variant-numeric: tabular-nums;
+}
+
+.app-cl-nowrap {
+    white-space: nowrap;
+}
+
+.app-cmp-empty {
+    padding: 2rem;
+    text-align: center;
+    color: var(--c-muted);
+    background: var(--c-surface);
+    border: 1px dashed var(--c-line);
+    border-radius: var(--radius);
+}
+
+.app-cmp-summary {
+    margin: 0 0 1rem;
+}
+
+/* ---------- 12. ส่วนทั่วไป ---------- */
+.app-cmp-section {
+    margin-bottom: 2.5rem;
+}
+
+.app-cmp-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.app-cmp-hint {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--c-muted);
+}
+
+code {
+    padding: 0.05rem 0.35rem;
+    border-radius: 4px;
+    background: #eef1ec;
+    font-size: 0.9em;
+}
+
+/*
+ * ขั้นที่ 2 (คนที่ 2) เพิ่มต่อ: ป้ายสถานะ (เปิดรับ/เต็ม/จบแล้ว), หน้ารายละเอียด + กล่องสมัคร,
+ * การ์ดกิจกรรมหน้าแรก, แท็บ, ปุ่มหมวดหมู่
+ */
+
+/* ---------- 13. หน้าจอเล็ก ---------- */
+@media (max-width: 760px) {
+    .app-cmp-header-bar {
+        gap: 0.6rem;
+    }
+
+    .app-cmp-main-nav {
+        order: 3;
+        flex-basis: 100%;
+    }
+
+    .app-cmp-user-panel {
+        margin-left: auto;
+    }
+
+    .app-cmp-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .app-cmp-data-list {
+        display: block;
+        overflow-x: auto;
+    }
+}
