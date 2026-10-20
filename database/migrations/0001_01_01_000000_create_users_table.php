@@ -18,6 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+            // role ของผู้ใช้: ADMIN หรือ USER (ตั้งในโค้ดเท่านั้น ไม่รับจากฟอร์ม)
+            $table->string('role', 32);
             $table->timestamps();
         });
 
