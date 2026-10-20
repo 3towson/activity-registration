@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CategorySeeder::class,
             OrganizerSeeder::class,
+            ActivitySeeder::class,
+            RegistrationSeeder::class,
         ]);
     }
 }
