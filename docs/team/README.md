@@ -146,6 +146,9 @@ route แยกไฟล์ตามเจ้าของ แล้ว `routes/w
 | แก้ไข | `GET /{code}/update` (ฟอร์ม) + `POST /{code}` (บันทึก) | Week 08 |
 | ลบ | `POST /{code}/delete` + ฟอร์มแยก `id="app-form-delete"` + ปุ่ม `form="app-form-delete"` | Week 08 |
 | กัน N+1 | `with([...])`, `withCount('participants')` | Week 09 |
+| ความสัมพันธ์ | `associate()` (FK), `attach()` / `detach()` (ตารางกลาง), กันซ้ำด้วย `whereDoesntHave` + `firstOrFail()` แบบ `addShop` · dropdown ใช้ `@selected` | Week 10 |
+| ตาราง / ฟอร์มค้นหา | แต่ละหน้าเขียนเองในไฟล์ของตัวเอง (ในคาบไม่ใช้ `@include`) · ยืม filter ของ controller อื่นด้วย `\resolve(XxxController::class)` | Week 09–10 |
+| สิทธิ์ | Policy คืน `bool` · controller `Gate::authorize()` · view `@can` / `@else` | Week 12 |
 | ข้อความสำเร็จ | `->with('status', '...')` | Week 11 |
 | ปุ่ม Back / Cancel | bookmarks: หน้าที่จะพาไปต่อจด `session()->put('bookmarks.xxx.view', url()->full())` · ปุ่มใช้ `session()->get('bookmarks.xxx.view') ?? route('xxx.index')` | Week 11 (Lab 11) |
 | ข้อความ error | `->withErrors(['alert' => ...])` + `try/catch QueryException` → `errorInfo[2]` | Week 13 |
@@ -198,7 +201,7 @@ route แยกไฟล์ตามเจ้าของ แล้ว `routes/w
 - [ ] Guest เปิดหน้าแรก/รายการ/รายละเอียดกิจกรรม/สมัครสมาชิกได้ แต่เข้า protected routes แล้วถูกพาไป login
 - [ ] USER ดูหน้าหมวดหมู่/ผู้จัดได้แต่ไม่เห็นปุ่มสร้าง/แก้/ลบ · เปิด URL ของ ADMIN เอง (เช่น `/categories/create`, `/activities/create`) ได้ **403**
 - [ ] ปุ่ม Back / Cancel กลับไปหน้ารายการเดิมพร้อมคำค้นและหน้าที่เปิดไว้ (bookmarks)
-- [ ] ADMIN สมัครกิจกรรมไม่ได้ · สมัครซ้ำ/เต็ม/จบแล้ว ไม่ได้ และมีข้อความบอกเหตุผล
+- [ ] ADMIN สมัครกิจกรรมไม่ได้ · กิจกรรมที่สมัครแล้ว / เต็ม / จบแล้ว ไม่มีปุ่มสมัคร และหน้ารายละเอียดบอกสถานะ · ส่ง request เองได้ 403 หรือกล่องแดง
 - [ ] ลบหมวด/ผู้จัดที่มีกิจกรรมไม่ได้ · ลบ CT004/OG004 ได้
 - [ ] บัตร PDF ภาษาไทยอ่านได้ และดาวน์โหลดได้เฉพาะกิจกรรมที่ตัวเองสมัคร
 - [ ] ทุกหน้าเป็น Blade (ไม่เป็น SPA) ใช้ CSS กลาง ลองบนมือถือแล้วไม่ล้นจอ

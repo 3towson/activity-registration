@@ -19,11 +19,9 @@ abstract class SearchableController extends Controller
 
     function prepareCriteria(array $criteria): array
     {
-        $term = \trim((string) ($criteria['term'] ?? ''));
-
         return [
+            'term' => null,
             ...$criteria,
-            'term' => ($term === '') ? null : $term,
         ];
     }
 

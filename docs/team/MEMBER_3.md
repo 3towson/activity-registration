@@ -88,7 +88,7 @@ Branch: `member-3/organizers-accounts`
 - **ส่งให้ทุกคน (ต้นขั้นที่ 1):** repo + วิธีติดตั้ง, `User::isAdministrator()` / `isMember()`, บัญชีทดสอบ, layout (`@extends('layouts.main', ['title' => ...])`, `@section('header')`, `@section('content')`), วิธีส่งข้อความ (`status` / `alert`)
 - **ส่งให้คนที่ 1:** `Organizer` model + `User::activities()`
 - **รับจากคนที่ 2:** `SearchableController`, CSS class, โครง CategoryController / views เพื่อทำ Organizer
-- **รับจากคนที่ 1:** `views/activities/table` สำหรับ `organizers.view-activities`, `Activity::statusLabel()` สำหรับการ์ดหน้าแรก (หน้า "กิจกรรมของฉัน" ทำตารางเองเพราะมีคอลัมน์เวลาสมัครและลิงก์บัตร)
+- **รับจากคนที่ 1:** `ActivityController::filter()` (ยืมผ่าน `\resolve()`) สำหรับ `organizers.view-activities` (ตารางเขียนเองในไฟล์ แบบ `view-products` ในคาบ), `Activity::isOpen()` / `isFull()` สำหรับการ์ดหน้าแรก
 
 ## Checklist ว่างานเสร็จ
 

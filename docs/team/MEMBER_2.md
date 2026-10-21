@@ -32,7 +32,7 @@ Branch: `member-2/categories-css-pdf`
 2. `required` ใน HTML + `try/catch QueryException` + ข้อความ `status` / `alert` ทุก action (ไม่ใช้ `Validator`)
 3. ปุ่ม Back / Cancel ใช้ bookmarks แบบ Lab 11 (ดูตัวอย่างใน `categories/list`, `view`, `create-form` ของ my-db)
 3. ปุ่ม Delete โผล่เฉพาะหมวดที่ไม่มีกิจกรรม (`@can('delete', $category)`) และกันที่ controller ด้วย `Gate::authorize('delete', ...)`
-4. หน้า "กิจกรรมในหมวดนี้" — ใช้ `$category->activities()` + ยืม `filter()` ของ `ActivityController` ผ่าน `\resolve(ActivityController::class)` (แบบเดียวกับหน้า `view-products` ของ Category ในคาบ) และ `@include('activities.table')` ของคนที่ 1
+4. หน้า "กิจกรรมในหมวดนี้" — แบบหน้า `view-products` ของ Category ในคาบ: ใช้ `$category->activities()` + ยืม `prepareCriteria()` / `filter()` ของ `ActivityController` ผ่าน `\resolve(ActivityController::class)` · **เขียนตารางกิจกรรมเองในไฟล์ `categories/view-activities.blade.php`** (ในคาบเขียนตารางซ้ำเอง ไม่ใช้ `@include`) ระหว่างที่ `ActivityController` ยังไม่เสร็จ ใช้ `$category->activities()->paginate()` ตรง ๆ ไปก่อนได้
 
 ### ข. CSS ทั้งเว็บ (R5)
 
@@ -128,7 +128,7 @@ function download(string $activityCode): Response
 
 - **ส่งให้ทุกคน (ต้นขั้นที่ 1):** `SearchableController` และชื่อ class CSS ที่ใช้ได้ (ตาราง, ฟอร์ม, ปุ่ม, ป้ายสถานะ)
 - **ส่งให้คนที่ 3:** แจ้งว่า `OrganizerController` / `OrganizerPolicy` / views ใช้โครงเดียวกับ Category ได้เลย
-- **รับจากคนที่ 1:** `Activity::participants()`, `views/activities/table` + `search-form`, ปุ่มลิงก์ไป `activities.ticket`
+- **รับจากคนที่ 1:** `Activity::participants()`, `ActivityController::filter()` (ยืมผ่าน `\resolve()`), ปุ่มลิงก์ไป `activities.ticket`
 - **รับจากคนที่ 3:** layout หลัก (คนที่ 2 แต่งเฉพาะ CSS — ถ้าต้องเพิ่ม class ใน layout ให้บอกคนที่ 3)
 
 ## Checklist ว่างานเสร็จ

@@ -191,8 +191,8 @@ function isAdministrator(): bool { return $this->role === 'ADMIN'; }
 | | `create`, `update` | `isAdministrator()` |
 | | `delete` | เหมือน `update` |
 | | `viewParticipants` | เหมือน `update` |
-| | `register(User $user, Activity $activity)` | role USER **และ** ยังไม่เคยสมัคร **และ** ยังไม่เต็ม **และ** ยังไม่ถึงวันจัด |
-| | `cancel(User $user, Activity $activity)` | สมัครแล้ว **และ** ยังไม่ถึงวันจัด |
+| | `register(User $user, Activity $activity)` | คืน `bool` · role USER **และ** ยังไม่เต็ม **และ** ยังไม่เลยวันจัด (สมัครซ้ำกันใน controller แบบ `addShop`) |
+| | `cancel(User $user, Activity $activity)` | คืน `bool` · role USER **และ** ยังไม่เลยวันจัด |
 | | (บัตร PDF) | `TicketController` ค้นจาก `$user->activities()` เท่านั้น → ไม่ได้สมัคร = 404 |
 | `CategoryPolicy` | `list()`, `view()` | `true` — ทุกคนที่ login (route ครอบ `auth` อยู่แล้ว) **เหมือน `CategoryPolicy` ในคาบ** |
 | | `create`, `update` | `isAdministrator()` |
@@ -273,7 +273,7 @@ route แยกไฟล์ตามเจ้าของงาน แล้ว 
 
 | กฎ | ทำที่ไหน | วิธี (อ้างอิงคาบ) |
 |---|---|---|
-| สมัครซ้ำไม่ได้ | Policy `register` + PK คู่ใน pivot | `$activity->participants()->where('users.id', $user->id)->exists()` |
+| สมัครซ้ำไม่ได้ | Controller `register` + PK คู่ใน pivot | แบบ `addShop` ในคาบ: `whereDoesntHave('participants', ...)` + `firstOrFail()` ใน `try` (Week 10) |
 | สมัครเกินจำนวนรับไม่ได้ | Policy `register` | `loadCount('participants')` เทียบ `capacity` (Week 9) |
 | สมัคร/ยกเลิกหลังวันจัดไม่ได้ | Policy `register`, `cancel` | `$activity->date` เทียบ `today()` |
 | ADMIN สมัครกิจกรรมไม่ได้ | Policy `register` | ตรวจ `role === 'USER'` |
@@ -283,7 +283,7 @@ route แยกไฟล์ตามเจ้าของงาน แล้ว 
 | สมัคร / ยกเลิก | Controller | `attach()` / `detach()` (Week 10) |
 
 ในหน้า view แสดงสถานะให้ผู้ใช้เห็น เช่น "รับ 30 / สมัครแล้ว 12", "เต็มแล้ว", "คุณสมัครกิจกรรมนี้แล้ว" และปุ่มสมัคร/ยกเลิกครอบด้วย `@can`
-ถ้ากดเมื่อไม่ผ่าน (เช่น มีคนสมัครแทรกจนเต็ม) controller ตรวจด้วย `Gate::check()` แล้ว redirect กลับพร้อม `withErrors(['alert' => 'ไม่สามารถสมัครกิจกรรมนี้ได้'])`
+ปุ่มกดได้เฉพาะเมื่อ `@can` ผ่าน ส่วนกรณีไม่ผ่าน `@else` แสดงข้อความสถานะแทนปุ่ม ถ้ามีคนส่ง request เอง: ไม่ผ่าน Policy → `Gate::authorize` ได้ 403 · สมัครซ้ำ → `firstOrFail()` หาไม่เจอ → `catch` → `withErrors(['alert' => ...])`
 
 ---
 
