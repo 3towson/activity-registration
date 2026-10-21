@@ -61,7 +61,7 @@
             <tbody>
                 @foreach ($activities as $activity)
                     <tr>
-                        <th>{{ $activity->code }}</th>
+                        <th class="app-cl-code">{{ $activity->code }}</th>
                         <td>{{ $activity->name }}</td>
                         <td>{{ $activity->category->name }}</td>
                         <td>{{ $activity->organizer->name }}</td>

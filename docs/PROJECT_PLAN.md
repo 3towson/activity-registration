@@ -179,7 +179,8 @@ function isAdministrator(): bool { return $this->role === 'ADMIN'; }
 | ดูกิจกรรมที่ตัวเองสมัคร | ❌ | ✅ | ❌ |
 | ดาวน์โหลดบัตรเข้าร่วม PDF | ❌ | ✅ (เฉพาะที่สมัครแล้ว) | ❌ |
 | CRUD กิจกรรม | ❌ | ❌ | ✅ |
-| CRUD หมวดหมู่ / ผู้จัด | ❌ | ❌ | ✅ |
+| ดูหมวดหมู่ / ผู้จัด (รายการ, รายละเอียด, กิจกรรมในหมวด/ผู้จัด) | ❌ (ไป login) | ✅ | ✅ |
+| สร้าง / แก้ / ลบ หมวดหมู่ / ผู้จัด | ❌ | ❌ (ปุ่มซ่อน + 403) | ✅ |
 | ดูรายชื่อผู้สมัครของกิจกรรม | ❌ | ❌ | ✅ |
 
 ### Policies
@@ -193,7 +194,8 @@ function isAdministrator(): bool { return $this->role === 'ADMIN'; }
 | | `register(User $user, Activity $activity)` | role USER **และ** ยังไม่เคยสมัคร **และ** ยังไม่เต็ม **และ** ยังไม่ถึงวันจัด |
 | | `cancel(User $user, Activity $activity)` | สมัครแล้ว **และ** ยังไม่ถึงวันจัด |
 | | (บัตร PDF) | `TicketController` ค้นจาก `$user->activities()` เท่านั้น → ไม่ได้สมัคร = 404 |
-| `CategoryPolicy` | `list`, `view`, `create`, `update` | `isAdministrator()` |
+| `CategoryPolicy` | `list()`, `view()` | `true` — ทุกคนที่ login (route ครอบ `auth` อยู่แล้ว) **เหมือน `CategoryPolicy` ในคาบ** |
+| | `create`, `update` | `isAdministrator()` |
 | | `delete` | admin **และ** `activities_count === 0` (ใช้ `loadCount('activities')`) |
 | `OrganizerPolicy` | เหมือน `CategoryPolicy` | |
 
@@ -207,15 +209,22 @@ function isAdministrator(): bool { return $this->role === 'ADMIN'; }
 
 ทุก route ครอบด้วย `cache.headers:no_store;no_cache;must_revalidate;max_age=0`
 
-route แยกไฟล์ตามเจ้าของงาน แล้ว `routes/web.php` `require` เข้ามารวมกัน: `auth.php`, `activities.php`, `tickets.php`, `my-activities.php`, `categories.php`, `organizers.php`
+route แยกไฟล์ตามเจ้าของงาน แล้ว `routes/web.php` `require` เข้ามารวมกัน: `auth.php`, `activities.php`, `categories.php`, `tickets.php`, `organizers.php`, `my-activities.php` — ผลเหมือนเขียนไฟล์เดียว (ดูได้จาก `php artisan route:list`)
 
-> ⚠️ **ลำดับการประกาศ:** `/activities/create` (admin, อยู่ในกลุ่ม `auth`) ต้องถูกประกาศ **ก่อน** `/activities/{activity}` (public, อยู่นอก `auth`) ไม่งั้นคำว่า `create` จะถูกจับเป็น `{activity}` → ใน `web.php` ให้วางกลุ่ม `auth` ไว้ **บน** route public ของ activities
+แต่ละ resource เขียนแบบเดียวกับ `/products`, `/categories` ใน `web.php` ของ my-db:
+`GET /xxx/list` = หน้ารายการ (`xxx.list`) · `ANY /xxx` → redirect ไป list (`xxx.index`) · เมนูและปุ่ม Back ลิงก์ไป `xxx.index`
+(ไม่ต้องใส่บรรทัด `Route::post('', 'list')` ที่ซ้ำกับ `create` ในคาบ)
+
+> ⚠️ **ลำดับการประกาศใน `routes/activities.php`** (ตัวอย่างในคอมเมนต์ของไฟล์เรียงถูกแล้ว):
+> 1. `ANY /activities` (index) ต้องอยู่ **ก่อน** `POST /activities` (create) เหมือนในคาบ — ถ้าสลับ ANY จะทับ POST แล้วกดสร้างกิจกรรมจะโดน redirect แทนการบันทึก
+> 2. กลุ่ม `auth` (มี `/activities/create`) ต้องอยู่ **ก่อน** `GET /activities/{activity}` (public) — ไม่งั้นคำว่า `create` จะถูกจับเป็น `{activity}`
 
 ### Public (ไม่ต้อง login)
 | Method | URL | Name | Controller@method |
 |---|---|---|---|
-| GET | `/` | `home` | `HomeController@index` — กิจกรรมที่ใกล้จะจัด 5 รายการ |
-| GET | `/activities` | `activities.list` | `ActivityController@list` |
+| GET | `/` | `home` | `HomeController@index` — กิจกรรมที่ใกล้จะจัด |
+| GET | `/activities/list` | `activities.list` | `ActivityController@list` |
+| ANY | `/activities` | `activities.index` | redirect → `activities.list` |
 | GET | `/activities/{activity}` | `activities.view` | `ActivityController@view` |
 
 ### Auth (ไม่ต้อง login)
@@ -245,17 +254,18 @@ route แยกไฟล์ตามเจ้าของงาน แล้ว 
 | POST | `/activities/{activity}/delete` | `activities.delete` | `delete` |
 | GET | `/activities/{activity}/participants` | `activities.view-participants` | `viewParticipants` |
 
-### Admin — Categories (ต้อง login) — Organizers ใช้โครงเดียวกันที่ `/organizers`
-| Method | URL | Name | Controller@method |
-|---|---|---|---|
-| GET | `/categories` | `categories.list` | `list` |
-| GET | `/categories/create` | `categories.create-form` | `showCreateForm` |
-| POST | `/categories` | `categories.create` | `create` |
-| GET | `/categories/{category}` | `categories.view` | `view` |
-| GET | `/categories/{category}/update` | `categories.update-form` | `showUpdateForm` |
-| POST | `/categories/{category}` | `categories.update` | `update` |
-| POST | `/categories/{category}/delete` | `categories.delete` | `delete` |
-| GET | `/categories/{category}/activities` | `categories.view-activities` | `viewActivities` |
+### Categories (ต้อง login) — Organizers ใช้โครงเดียวกันที่ `/organizers`
+| Method | URL | Name | Controller@method | สิทธิ์ |
+|---|---|---|---|---|
+| GET | `/categories/list` | `categories.list` | `list` | ทุกคนที่ login |
+| ANY | `/categories` | `categories.index` | redirect → list | ทุกคนที่ login |
+| POST | `/categories` | `categories.create` | `create` | ADMIN |
+| GET | `/categories/create` | `categories.create-form` | `showCreateForm` | ADMIN |
+| GET | `/categories/{category}` | `categories.view` | `view` | ทุกคนที่ login |
+| POST | `/categories/{category}` | `categories.update` | `update` | ADMIN |
+| GET | `/categories/{category}/update` | `categories.update-form` | `showUpdateForm` | ADMIN |
+| POST | `/categories/{category}/delete` | `categories.delete` | `delete` | ADMIN (หมวดว่าง) |
+| GET | `/categories/{category}/activities` | `categories.view-activities` | `viewActivities` | ทุกคนที่ login |
 
 ---
 
@@ -267,7 +277,7 @@ route แยกไฟล์ตามเจ้าของงาน แล้ว 
 | สมัครเกินจำนวนรับไม่ได้ | Policy `register` | `loadCount('participants')` เทียบ `capacity` (Week 9) |
 | สมัคร/ยกเลิกหลังวันจัดไม่ได้ | Policy `register`, `cancel` | `$activity->date` เทียบ `today()` |
 | ADMIN สมัครกิจกรรมไม่ได้ | Policy `register` | ตรวจ `role === 'USER'` |
-| แก้ `capacity` ให้น้อยกว่าคนที่สมัครแล้วไม่ได้ | Validation ตอน update | `'capacity' => "required|integer|min:{$activity->participants_count}"` |
+| แก้ `capacity` ให้น้อยกว่าคนที่สมัครแล้วไม่ได้ | Controller `update` | `loadCount('participants')` แล้วถ้า `capacity` ใหม่น้อยกว่า → `withInput()->withErrors(['alert' => '...'])` |
 | ลบหมวด/ผู้จัดที่ยังมีกิจกรรมไม่ได้ | Policy `delete` + FK restrict | `loadCount('activities')` (Week 12) |
 | ตั้ง category/organizer ของกิจกรรม | Controller | `associate()` — ห้ามเซ็ต `category_id` ตรง ๆ (Week 10) |
 | สมัคร / ยกเลิก | Controller | `attach()` / `detach()` (Week 10) |
@@ -277,18 +287,22 @@ route แยกไฟล์ตามเจ้าของงาน แล้ว 
 
 ---
 
-## 7. Validation
+## 7. การตรวจข้อมูล (แบบในคาบ — ไม่ใช้ Validator ใน CRUD)
 
-ใช้ `Validator::make($request->getParsedBody(), [...])` ใน create/update ทุกตัว ถ้าไม่ผ่าน → `redirect()->back()->withInput()->withErrors($validator)` แล้วแสดง `@error('field')` ใต้ช่องในฟอร์ม
+ใน my-db ตอน create / update **ไม่มี `Validator`** — ใช้ 3 ชั้นนี้แทน ให้ทำแบบเดียวกัน:
 
-| ฟอร์ม | กฎ |
-|---|---|
-| Category | `code`: required, max:64, unique · `name`: required · `description`: required |
-| Organizer | `code`: required, max:64, unique · `name`: required · `contact`: required |
-| Activity | `code`: required, max:64, unique · `name`: required · `category`: required, exists:categories,code · `organizer`: required, exists:organizers,code · `date`: required, date · `location`: required · `capacity`: required, integer, min:1 (ตอน update: min = จำนวนผู้สมัคร) · `description`: required |
-| สมัครสมาชิก | `name`: required · `email`: required, email, unique:users · `password`: required, min:4, confirmed |
+1. **HTML** — `required`, `type="email" / "date" / "number"`, `min`, `maxlength` ในฟอร์ม (browser ไม่ให้ส่งค่าว่าง/ผิดรูปแบบ)
+2. **ฐานข้อมูล** — `unique`, `NOT NULL`, foreign key ใน migration ถ้าผิด → `QueryException` → `catch` แล้ว `withErrors(['alert' => $excp->errorInfo[2]])` เช่น `Duplicate entry 'CT001' for key 'categories_code_unique'`
+3. **Controller** — กฎที่ฐานข้อมูลตรวจไม่ได้ เช็กเองแล้ว `withErrors(['alert' => '...'])` เช่น จำนวนรับต่ำกว่าจำนวนผู้สมัคร · หา category/organizer ด้วย `firstOrFail()` (ไม่เจอ → error)
 
-> ตอน update ต้องยกเว้น record ตัวเองในกฎ unique เช่น `Rule::unique('activities', 'code')->ignore($activity->id)`
+| ฟอร์ม | HTML | ฐานข้อมูล / controller |
+|---|---|---|
+| Category | `code`, `name`, `description` required | `code` unique |
+| Organizer | `code`, `name`, `contact` required | `code` unique |
+| Activity | ทุกช่อง required · `date` type=date · `capacity` type=number min=1 | `code` unique · category/organizer `firstOrFail()` · ตอน update: `capacity` ≥ จำนวนผู้สมัคร (เช็กใน controller) |
+| สมัครสมาชิก | `name`, `email` (type=email), `password` required | `email` unique (อีเมลซ้ำ → Duplicate entry) — เขียนแบบ `UserController::create` ใน Lab 13 |
+
+`Validator` ใช้ที่เดียวคือ **login** (เหมือนในคาบ) — แสดง `@error('credentials')`
 
 ---
 
@@ -305,7 +319,8 @@ route แยกไฟล์ตามเจ้าของงาน แล้ว 
 
 - สำเร็จ = สีเขียว (`[role=status]`), error = สีแดง (`[role=alert]`)
 - ทุกจุดที่แก้ฐานข้อมูลครอบ `try { ... } catch (QueryException $e) { ...errorInfo[2] } catch (\Exception $e) { ...getMessage() }`
-- ฟอร์ม (create/update/register) ใช้ `withInput()` + `old()` · ปุ่ม (delete/สมัคร/ยกเลิก) ไม่ใช้ `withInput()`
+- ฟอร์ม (create/update/register) ใช้ `withInput()` + `old()` เพื่อเติมค่าเดิมกลับ (login/สมัครสมาชิก ไม่คืนรหัสผ่าน) · ปุ่ม (delete/สมัคร/ยกเลิก) ไม่ใช้ `withInput()`
+- ปุ่ม Back / Cancel ใช้ **bookmarks** แบบ Lab 11: หน้ารายการจด `session()->put('bookmarks.xxx.view', url()->full())` แล้วปุ่ม Back ใช้ `session()->get('bookmarks.xxx.view') ?? route('xxx.index')`
 
 | การกระทำ | ข้อความสำเร็จ |
 |---|---|
@@ -379,7 +394,11 @@ body { font-family: 'Sarabun', sans-serif; }
 | flash | `->with('status', ...)` / `->withErrors(['alert' => ...])` | `success` / `error` |
 | ตรวจสิทธิ์ | Policy + `Gate::authorize()` / `Gate::check()` + `@can` | middleware ตรวจ role, `$this->authorize()` |
 | ตั้ง FK | `associate()` | `$activity->category_id = ...` |
-| ค้นหา | `SearchableController` (เขียนใหม่เอง) + `paginate(5)` + `withQueryString()->links()` | |
+| ค้นหา | `SearchableController` (เขียนใหม่เอง) + `paginate(5)` + `withQueryString()->links()` · ฟอร์มค้นหา `<search><form class="app-cmp-search-form"><fieldset><legend>` | |
+| URL หน้ารายการ | `GET /xxx/list` (`xxx.list`) + `ANY /xxx` → redirect (`xxx.index`) แบบ my-db | `GET /xxx` เป็นหน้ารายการ |
+| ตรวจข้อมูลใน CRUD | `required` ใน HTML + `try/catch QueryException` + เช็กกฎพิเศษใน controller (ดูข้อ 7) | `Validator` (ใช้แค่ใน login) |
+| ปุ่ม Back / Cancel | bookmarks ใน session (Lab 11) `session()->put('bookmarks.xxx.view', url()->full())` | `route('xxx.list')` ตรง ๆ (คำค้น/หน้าที่เปิดไว้หาย) |
+| ชื่อ class ใน view | ตาม `lec04-styles.css`: `app-cl-button app-cl-filled app-cl-primary` / `app-cl-warning`, `app-cmp-data-list`, `app-cmp-data-form`, `app-cmp-data-detail`, `app-cmp-links-bar`, `app-cmp-form-actions`, `app-cmp-form-secondary-actions`, `app-cl-code`, `app-cl-link`, `app-cl-active` (CSS เขียนเองใน `app.css`) | ตั้งชื่อ class ใหม่เอง |
 | N+1 | `with(['category', 'organizer'])`, `withCount('participants')` | |
 | Mass assignment | `#[Fillable([...])]` ไม่ใส่ FK, `email`, `role` | |
 
@@ -395,9 +414,9 @@ body { font-family: 'Sarabun', sans-serif; }
 | # | Requirement | ทำด้วยอะไร |
 |---|---|---|
 | R1 | Model ≥ 3 + relationship | Category, Organizer, Activity · `hasMany`/`belongsTo` (2 คู่) + `belongsToMany` (Activity–User) · ใช้จริงในหน้ารายละเอียด, `view-activities`, `view-participants`, `my-activities` |
-| R2 | CRUD ≥ 3 model | Category, Organizer, Activity — list, view, create, update, delete + validation |
-| R3 | Notification + error | `status` / `alert` ใน layout, `try/catch QueryException`, validation error ใต้ช่อง |
-| R4 | Auth + 2 role + protected + public | login/logout/สมัครสมาชิก · ADMIN/USER ทำคนละอย่าง · `auth` middleware + Policy · public: `/`, `/activities`, `/activities/{code}`, `/auth/register` |
+| R2 | CRUD ≥ 3 model | Category, Organizer, Activity — list, view, create, update, delete (ตรวจข้อมูลแบบในคาบ: HTML `required` + ฐานข้อมูล + controller) |
+| R3 | Notification + error | `status` (เขียว) / `alert` (แดง) ใน layout, `try/catch QueryException` → `errorInfo[2]`, กฎพิเศษใน controller → `alert` |
+| R4 | Auth + 2 role + protected + public | login/logout/สมัครสมาชิก · ADMIN/USER ทำคนละอย่าง · `auth` middleware + Policy · USER ดูหมวดหมู่/ผู้จัดได้แต่แก้ไม่ได้ (ปุ่มซ่อน + 403) · public: `/`, `/activities/list`, `/activities/{code}`, `/auth/register` |
 | R5 | CSS | `public/css/app.css` เขียนเอง ใช้ทุกหน้าผ่าน layout หลัก |
 | R6 | PHP library | `barryvdh/laravel-dompdf` → บัตรเข้าร่วม PDF |
 
@@ -459,4 +478,4 @@ body { font-family: 'Sarabun', sans-serif; }
 - [ ] ใช้โครงสร้างแบบ `my-db` (เช่น `SearchableController`, bookmarks) แต่เขียนใหม่เองในโปรเจกต์ใหม่ ได้หรือไม่
 - [ ] `barryvdh/laravel-dompdf` นับเป็น R6 ได้หรือไม่ (ไม่ได้สอนใน Week 01–06 ใช่ไหม)
 - [ ] เขียน CSS เองทั้งหมด หรือใช้ CSS ของรายวิชา (`lec04-styles.css`) เป็นฐานได้หรือไม่
-- [ ] Validation เป็นส่วนที่ต้องมีใน R2 หรือไม่ (กลุ่มตั้งใจทำอยู่แล้ว)
+- [ ] ตรวจข้อมูลแบบในคาบ (HTML `required` + error จากฐานข้อมูลผ่าน `try/catch` ไม่ใช้ `Validator`) เพียงพอสำหรับ R2 หรือไม่

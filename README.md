@@ -167,11 +167,17 @@ git checkout -b member-3/organizers-accounts # คนที่ 3
 
 | คน | เริ่มที่ไฟล์ | งานแรกที่แนะนำ |
 |---|---|---|
-| คนที่ 1 | `routes/activities.php`, `ActivityController`, `ActivityPolicy` | หน้า public รายการ + รายละเอียดกิจกรรม (เมนู "กิจกรรม" จะโผล่เองเมื่อมี route `activities.list`) |
-| คนที่ 2 | `routes/categories.php`, `CategoryController`, `CategoryPolicy` | Category list/view → create/update/delete · แล้วทดสอบ dompdf ฟอนต์ไทยให้ผ่านก่อน |
+| คนที่ 1 | `routes/activities.php`, `ActivityController`, `ActivityPolicy` | หน้า public รายการ + รายละเอียดกิจกรรม (เมนู "กิจกรรม" จะโผล่เองเมื่อมี route `activities.index`) |
+| คนที่ 2 | `routes/categories.php`, `CategoryController`, `CategoryPolicy` | Category list/view → create/update/delete (เมนู "หมวดหมู่" โผล่เองเมื่อมี route `categories.index`) · แล้วทดสอบ dompdf ฟอนต์ไทยให้ผ่านก่อน |
 | คนที่ 3 | `routes/organizers.php`, `routes/auth.php`, `OrganizerController` | หน้าสมัครสมาชิก (ลิงก์ในหน้า login/เมนูจะโผล่เอง) → Organizer CRUD → หน้าแรกจริง |
 
 รายละเอียดทั้งหมด (routes, validation, checklist, สิ่งที่ต้องอธิบาย): [`docs/team/MEMBER_1.md`](docs/team/MEMBER_1.md) · [`MEMBER_2.md`](docs/team/MEMBER_2.md) · [`MEMBER_3.md`](docs/team/MEMBER_3.md)
+
+**เขียนให้เหมือนเว็บในคาบ (my-db)** — สรุปจาก `docs/team/README.md`
+- route: `GET /xxx/list` + `ANY /xxx` → redirect (`xxx.index`) · ตัวอย่างอยู่ในคอมเมนต์ของไฟล์ route แต่ละไฟล์
+- CRUD ไม่ใช้ `Validator`: `required` ใน HTML + `try/catch QueryException` → `withErrors(['alert' => ...])`
+- ปุ่ม Back / Cancel ใช้ bookmarks (Lab 11)
+- class ใน view ใช้ชื่อตาม `lec04-styles.css` (`app-cl-button app-cl-filled app-cl-primary`, `app-cmp-data-list`, `app-cmp-data-form`, `app-cmp-data-detail` …)
 
 **กติกา**
 - แตะเฉพาะไฟล์ของตัวเอง · ไฟล์ร่วม (`web.php`, layout, `User.php`, `app.css`, migrations) ต้องบอกเจ้าของก่อนแก้

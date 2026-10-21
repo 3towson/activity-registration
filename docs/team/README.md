@@ -128,7 +128,8 @@ route แยกไฟล์ตามเจ้าของ แล้ว `routes/w
 | สมัครสมาชิก | ✅ | – | – |
 | สมัคร / ยกเลิกกิจกรรม | ไป login | ✅ | ❌ |
 | กิจกรรมของฉัน, ดาวน์โหลดบัตร PDF | ไป login | ✅ (เฉพาะที่สมัคร) | ❌ |
-| CRUD กิจกรรม / หมวดหมู่ / ผู้จัด, รายชื่อผู้สมัคร | ไป login | ❌ 403 | ✅ |
+| ดูหมวดหมู่ / ผู้จัด (รายการ, รายละเอียด, กิจกรรมในหมวด/ผู้จัด) | ไป login | ✅ (ไม่เห็นปุ่มแก้) | ✅ |
+| CRUD กิจกรรม, สร้าง/แก้/ลบ หมวดหมู่ / ผู้จัด, รายชื่อผู้สมัคร | ไป login | ❌ 403 | ✅ |
 
 - กันที่ server ทุกครั้ง: `Gate::authorize()` ใน controller (ไม่ใช้ `$this->authorize()`) + `@can` ซ่อนปุ่มใน view
 - Policy ของหน้า public ใช้ `?User $user` ให้ Guest ผ่านได้
@@ -140,21 +141,23 @@ route แยกไฟล์ตามเจ้าของ แล้ว `routes/w
 |---|---|---|
 | รับ request | `ServerRequestInterface` → `getQueryParams()` / `getParsedBody()` | Week 07 |
 | URL | ใช้ `code` เช่น `/activities/AC001` · route คงที่ (`/create`) อยู่ก่อน `/{code}` | Week 07 |
-| ค้นหา + แบ่งหน้า | `SearchableController` + `paginate(5)` + `withQueryString()->links()` | Week 08 |
+| หน้ารายการ | `GET /xxx/list` (`xxx.list`) + `ANY /xxx` → redirect (`xxx.index`) · เมนู/ปุ่ม Back ลิงก์ไป `xxx.index` · ⚠️ `ANY ''` ต้องประกาศ **ก่อน** `POST ''` (create) ไม่งั้น ANY ทับ POST | `web.php` ของ my-db |
+| ค้นหา + แบ่งหน้า | `SearchableController` + `paginate(5)` + `withQueryString()->links()` · ฟอร์ม `<search><form class="app-cmp-search-form"><fieldset><legend>` | Week 08 |
 | แก้ไข | `GET /{code}/update` (ฟอร์ม) + `POST /{code}` (บันทึก) | Week 08 |
 | ลบ | `POST /{code}/delete` + ฟอร์มแยก `id="app-form-delete"` + ปุ่ม `form="app-form-delete"` | Week 08 |
 | กัน N+1 | `with([...])`, `withCount('participants')` | Week 09 |
 | ข้อความสำเร็จ | `->with('status', '...')` | Week 11 |
+| ปุ่ม Back / Cancel | bookmarks: หน้าที่จะพาไปต่อจด `session()->put('bookmarks.xxx.view', url()->full())` · ปุ่มใช้ `session()->get('bookmarks.xxx.view') ?? route('xxx.index')` | Week 11 (Lab 11) |
 | ข้อความ error | `->withErrors(['alert' => ...])` + `try/catch QueryException` → `errorInfo[2]` | Week 13 |
-| ฟอร์มผิด | `Validator::make(...)` → `withInput()->withErrors($validator)` · view ใช้ `old()` + `@error('field')` | Week 12–13 |
-| CSS class | `app-cmp-*` (ชิ้นส่วน), `app-cl-*` (class เสริม) | `lec04-styles.css` |
+| ตรวจข้อมูล | **ไม่ใช้ `Validator` ใน CRUD** (เหมือน my-db): `required` / `type` ใน HTML + error จากฐานข้อมูล (code ซ้ำ ฯลฯ) ผ่าน `try/catch` + กฎพิเศษเช็กใน controller → `withInput()->withErrors(['alert' => ...])` · view ใช้ `old()` · `Validator` มีแค่ใน login | Week 12–13 |
+| CSS class | ชื่อเดียวกับ `lec04-styles.css`: ปุ่ม `app-cl-button app-cl-filled app-cl-primary` / `app-cl-warning` · ตาราง `app-cmp-data-list` · ฟอร์ม `app-cmp-data-form` · รายละเอียด `<dl class="app-cmp-data-detail">` · `app-cmp-links-bar`, `app-cmp-form-actions`, `app-cmp-form-secondary-actions`, `app-cl-code`, `app-cl-link`, `app-cl-active` | `lec04-styles.css` |
 
 ### ชื่อ route (ลิงก์ไปหน้าคนอื่นได้เลย แม้หน้านั้นยังไม่เสร็จ)
 
 | ของ | ชื่อ route |
 |---|---|
-| คนที่ 1 | `activities.list`, `activities.view`, `activities.create-form`, `activities.create`, `activities.update-form`, `activities.update`, `activities.delete`, `activities.view-participants`, `activities.register`, `activities.cancel` |
-| คนที่ 2 | `categories.list`, `.view`, `.create-form`, `.create`, `.update-form`, `.update`, `.delete`, `.view-activities` · `activities.ticket` |
+| คนที่ 1 | `activities.index`, `activities.list`, `activities.view`, `activities.create-form`, `activities.create`, `activities.update-form`, `activities.update`, `activities.delete`, `activities.view-participants`, `activities.register`, `activities.cancel` |
+| คนที่ 2 | `categories.index`, `categories.list`, `.view`, `.create-form`, `.create`, `.update-form`, `.update`, `.delete`, `.view-activities` · `activities.ticket` |
 | คนที่ 3 | `home`, `login`, `authentication`, `logout`, `register-form`, `register`, `my-activities.list` · `organizers.*` (ชื่อเหมือน categories) |
 
 ### ไฟล์ที่ใช้ร่วมกัน (ห้ามแก้เองโดยไม่บอกเจ้าของ)
@@ -169,7 +172,7 @@ route แยกไฟล์ตามเจ้าของ แล้ว `routes/w
 
 - จะเพิ่ม/แก้คอลัมน์ → **บอกในกลุ่มก่อน** แก้แล้วให้ทุกคน `migrate:fresh --seed`
 - **ห้าม commit `.env`** (รหัส MySQL แต่ละเครื่องไม่เหมือนกัน) และ `vendor/`
-- commit บ่อย ๆ ข้อความ commit บอกว่าทำอะไร เช่น `Category CRUD: validation + try/catch`
+- commit บ่อย ๆ ข้อความ commit บอกว่าทำอะไรจริง ๆ เช่น `Category create/update + try/catch`
 
 ---
 
@@ -189,11 +192,12 @@ route แยกไฟล์ตามเจ้าของ แล้ว `routes/w
 ## ตรวจร่วมกันก่อนส่ง
 
 - [ ] เครื่องใหม่ติดตั้งตาม README ได้ และ `migrate:fresh --seed` ผ่านบน MySQL
-- [ ] CRUD ครบทั้ง Activity, Category, Organizer พร้อม validation
+- [ ] CRUD ครบทั้ง Activity, Category, Organizer · ช่องว่างส่งไม่ได้ (`required`) · code ซ้ำขึ้นกล่องแดงจากฐานข้อมูล
 - [ ] ทุก create / update / delete / สมัคร / ยกเลิก มีข้อความสำเร็จ (เขียว) และกรณีผิดพลาดมีข้อความ error (แดง)
 - [ ] เห็น relationships ในหน้าเว็บจริง: ชื่อหมวด/ผู้จัดในหน้ากิจกรรม, กิจกรรมในหมวด/ผู้จัด, รายชื่อผู้สมัคร, กิจกรรมของฉัน
 - [ ] Guest เปิดหน้าแรก/รายการ/รายละเอียดกิจกรรม/สมัครสมาชิกได้ แต่เข้า protected routes แล้วถูกพาไป login
-- [ ] USER เปิด URL ของ ADMIN (เช่น `/categories`, `/activities/create`) ได้ **403** แม้พิมพ์ URL เอง
+- [ ] USER ดูหน้าหมวดหมู่/ผู้จัดได้แต่ไม่เห็นปุ่มสร้าง/แก้/ลบ · เปิด URL ของ ADMIN เอง (เช่น `/categories/create`, `/activities/create`) ได้ **403**
+- [ ] ปุ่ม Back / Cancel กลับไปหน้ารายการเดิมพร้อมคำค้นและหน้าที่เปิดไว้ (bookmarks)
 - [ ] ADMIN สมัครกิจกรรมไม่ได้ · สมัครซ้ำ/เต็ม/จบแล้ว ไม่ได้ และมีข้อความบอกเหตุผล
 - [ ] ลบหมวด/ผู้จัดที่มีกิจกรรมไม่ได้ · ลบ CT004/OG004 ได้
 - [ ] บัตร PDF ภาษาไทยอ่านได้ และดาวน์โหลดได้เฉพาะกิจกรรมที่ตัวเองสมัคร
@@ -206,15 +210,15 @@ route แยกไฟล์ตามเจ้าของ แล้ว `routes/w
 
 1. **Guest** — หน้าแรก → ค้นหากิจกรรม → ดูรายละเอียด → กดสมัครแล้วถูกพาไป login → เปิด `/categories` ตรง ๆ แล้วถูกพาไป login
 2. **สมัครสมาชิก** (คนที่ 3) — สร้างบัญชีใหม่ → ได้ role USER
-3. **USER** (คนที่ 1, 2, 3) — สมัคร AC003 → สมัครซ้ำไม่ได้ → สมัคร AC004 (เต็ม) ไม่ได้ → ดาวน์โหลดบัตร PDF → กิจกรรมของฉัน → ยกเลิก → พิมพ์ `/categories` ได้ 403
-4. **ADMIN** (คนที่ 1, 2, 3) — CRUD หมวด → CRUD ผู้จัด → CRUD กิจกรรม (มี validation error ให้ดู) → ลบหมวดที่มีกิจกรรมไม่ได้ → รายชื่อผู้สมัคร → สมัครกิจกรรมไม่ได้
+3. **USER** (คนที่ 1, 2, 3) — สมัคร AC003 → สมัครซ้ำไม่ได้ → สมัคร AC004 (เต็ม) ไม่ได้ → ดาวน์โหลดบัตร PDF → กิจกรรมของฉัน → ยกเลิก → ดูหน้าหมวดหมู่ได้แต่ไม่มีปุ่มแก้ → พิมพ์ `/categories/create` ได้ 403
+4. **ADMIN** (คนที่ 1, 2, 3) — CRUD หมวด → CRUD ผู้จัด → CRUD กิจกรรม (ลองใส่ code ซ้ำ → กล่องแดงจากฐานข้อมูล) → ลบหมวดที่มีกิจกรรมไม่ได้ → รายชื่อผู้สมัคร → สมัครกิจกรรมไม่ได้
 5. **อธิบาย library** (คนที่ 2) — `composer require`, config ฟอนต์ไทย, จุดเรียก `Pdf::loadView()`
 
 ---
 
 ## เอกสารอ้างอิง
 
-- [แผนโปรเจกต์](../PROJECT_PLAN.md) — schema, routes, business rules, validation ฉบับเต็ม
+- [แผนโปรเจกต์](../PROJECT_PLAN.md) — schema, routes, business rules, การตรวจข้อมูล ฉบับเต็ม
 - [กฎและเกณฑ์คะแนน](../PROJECT_RULES.md)
 - [สรุปเว็บตัวอย่าง my-db](../my-db-project-summary.md)
 - [Database / CRUD / Relationships — Week 07–09](../954348-week07-08-09-database-combined.md)

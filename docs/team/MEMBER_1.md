@@ -24,7 +24,7 @@ Branch: `member-1/activities`
 ## งานหลัก (ขั้นที่ 2)
 
 1. **หน้า public** — รายการกิจกรรม (ค้นหาด้วย code/ชื่อ/สถานที่/ชื่อหมวด/ชื่อผู้จัด, กรองหมวด, เฉพาะที่ยังไม่จัด, แบ่งหน้า) และรายละเอียดกิจกรรม (แสดงหมวด, ผู้จัด, จำนวน "สมัครแล้ว / รับ", สถานะ เปิดรับ / เต็มแล้ว / จบแล้ว)
-2. **Activity CRUD (ADMIN)** — สร้าง / แก้ไข / ลบ พร้อม validation และ `try/catch`
+2. **Activity CRUD (ADMIN)** — สร้าง / แก้ไข / ลบ แบบ Product ในคาบ (`required` ใน HTML + `try/catch`, ปุ่ม Back/Cancel ใช้ bookmarks)
 3. **สมัคร / ยกเลิก (USER)** พร้อมกฎ:
    - ADMIN สมัครไม่ได้
    - สมัครซ้ำไม่ได้
@@ -32,7 +32,7 @@ Branch: `member-1/activities`
    - สมัคร / ยกเลิกหลังวันจัดไม่ได้
    - ข้อความบอกเหตุผลเป็นภาษาไทย (Policy คืน `Response::deny('...')` แล้ว controller ใช้ `Gate::inspect()`)
 4. **รายชื่อผู้สมัคร (ADMIN)** — ตารางชื่อ, อีเมล, เวลาที่สมัคร (`$participant->pivot->created_at`) ค้นด้วยชื่อ/อีเมลได้
-5. แก้ `capacity` ให้น้อยกว่าจำนวนที่สมัครแล้วไม่ได้ (`min:{participants_count}` ตอน update)
+5. แก้ `capacity` ให้น้อยกว่าจำนวนที่สมัครแล้วไม่ได้ (เช็กใน controller ตอน update แล้วส่ง `alert`)
 6. ปุ่มในหน้ารายละเอียดตามสิทธิ์: Guest → "เข้าสู่ระบบเพื่อสมัคร" · USER → สมัคร / ยกเลิก / ดาวน์โหลดบัตร (ลิงก์ไป `activities.ticket` ของคนที่ 2) · ADMIN → แก้ไข / ลบ / รายชื่อผู้สมัคร
 
 ## ไฟล์ที่รับผิดชอบ
@@ -52,11 +52,14 @@ Branch: `member-1/activities`
 
 ## Routes
 
-> ⚠️ ใน `routes/activities.php` ต้องประกาศกลุ่ม `auth` **ก่อน** `GET /{activity}` ไม่งั้นคำว่า `create` ใน `/activities/create` จะถูกจับเป็นรหัสกิจกรรม
+> ⚠️ ลำดับใน `routes/activities.php` สำคัญ 2 ข้อ (ใช้ตามตัวอย่างในคอมเมนต์ของไฟล์ได้เลย):
+> 1. `ANY ''` (index) ต้องอยู่ **ก่อน** `POST ''` (create) — ถ้าสลับ ANY จะทับ POST แล้วกดสร้างกิจกรรมจะโดน redirect แทนการบันทึก
+> 2. กลุ่ม `auth` ต้องอยู่ **ก่อน** `GET /{activity}` — ไม่งั้นคำว่า `create` ใน `/activities/create` จะถูกจับเป็นรหัสกิจกรรม
 
 | Method / URL | Name | ทำอะไร | สิทธิ์ |
 |---|---|---|---|
-| GET `/activities` | `activities.list` | รายการ + ค้นหา + แบ่งหน้า | Public |
+| GET `/activities/list` | `activities.list` | รายการ + ค้นหา + แบ่งหน้า | Public |
+| ANY `/activities` | `activities.index` | redirect → list (เมนูลิงก์มาที่นี่) | Public |
 | GET `/activities/{activity}` | `activities.view` | รายละเอียด + ปุ่มตามสิทธิ์ | Public |
 | GET `/activities/create` | `activities.create-form` | ฟอร์มสร้าง | ADMIN |
 | POST `/activities` | `activities.create` | บันทึกใหม่ | ADMIN |
@@ -67,17 +70,16 @@ Branch: `member-1/activities`
 | POST `/activities/{activity}/register` | `activities.register` | สมัคร (`attach`) | USER |
 | POST `/activities/{activity}/cancel` | `activities.cancel` | ยกเลิก (`detach`) | USER ที่สมัครแล้ว |
 
-## Validation
+## การตรวจข้อมูล (แบบในคาบ — ไม่ใช้ Validator)
 
-| ช่อง | กฎ |
+เหมือน `ProductController::create/update` ใน my-db: ใช้ `required` ใน HTML + `try/catch` จับ error จากฐานข้อมูล + กฎพิเศษเช็กใน controller
+
+| ช่อง | ตรวจที่ไหน |
 |---|---|
-| `code` | required, max:64, `Rule::unique('activities','code')->ignore($activity?->id)` |
-| `name`, `location` | required, max:255 |
-| `category` | required, `exists:categories,code` |
-| `organizer` | required, `exists:organizers,code` |
-| `date` | required, date |
-| `capacity` | required, integer, min:1 (ตอน update: min = จำนวนผู้สมัคร) |
-| `description` | required |
+| ทุกช่อง | HTML `required` · `date` ใช้ `type="date"` · `capacity` ใช้ `type="number" min="1"` |
+| `code` ซ้ำ | ฐานข้อมูล (unique) → `QueryException` → กล่องแดง `Duplicate entry ...` |
+| `category`, `organizer` | `Category::where('code', $data['category'])->firstOrFail()` แล้ว `associate()` (แบบ Product → Category ในคาบ) |
+| `capacity` ตอน update | controller: `$activity->loadCount('participants')` ถ้า `capacity` ใหม่น้อยกว่า → `redirect()->back()->withInput()->withErrors(['alert' => 'จำนวนรับต้องไม่น้อยกว่าจำนวนผู้สมัคร (N คน)'])` |
 
 ## รับ / ส่งต่อ
 
@@ -88,11 +90,12 @@ Branch: `member-1/activities`
 
 ## Checklist ว่างานเสร็จ
 
-- [ ] Guest เปิด `/activities`, `/activities/AC001` ได้ · ค้นหา "จิตอาสา" แล้วเจอกิจกรรมในหมวดนั้น · เปลี่ยนหน้าแล้วคำค้นยังอยู่
+- [ ] Guest เปิด `/activities` (ไป `/activities/list`), `/activities/AC001` ได้ · ค้นหา "จิตอาสา" แล้วเจอกิจกรรมในหมวดนั้น · เปลี่ยนหน้าแล้วคำค้นยังอยู่
 - [ ] Guest เปิด `/activities/create` แล้วถูกพาไป login · USER เปิดแล้วได้ 403
 - [ ] ADMIN สร้าง / แก้ไข / ลบกิจกรรมได้ · แต่ละครั้งมีข้อความสำเร็จ
-- [ ] สร้างด้วย code ซ้ำ, ชื่อว่าง, หมวดที่ไม่มีจริง → มีข้อความ error ใต้ช่อง และค่าที่กรอกยังอยู่
-- [ ] แก้ AC001 ให้รับ 2 คน (สมัครแล้ว 3) → ไม่ได้
+- [ ] ช่องว่างกดส่งไม่ได้ (`required`) · สร้างด้วย code ซ้ำ → กล่องแดงจากฐานข้อมูล และค่าที่กรอกยังอยู่ (`old()`)
+- [ ] กด Back จากหน้ารายละเอียด → กลับหน้ารายการเดิมพร้อมคำค้นและหน้าที่เปิดไว้ (bookmarks)
+- [ ] แก้ AC001 ให้รับ 2 คน (สมัครแล้ว 3) → ไม่ได้ มีกล่องแดงบอกเหตุผล
 - [ ] USER สมัคร AC003 ได้ → สมัครซ้ำได้ข้อความ "สมัครไปแล้ว"
 - [ ] USER สมัคร AC004 (เต็ม) → "มีผู้สมัครเต็มแล้ว" · ยกเลิก AC008 (จบแล้ว) → "จบไปแล้ว"
 - [ ] ADMIN กดสมัคร (ส่ง POST เอง) → "ผู้ดูแลระบบไม่สามารถสมัครกิจกรรมได้"

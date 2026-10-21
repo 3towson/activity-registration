@@ -31,15 +31,16 @@ Branch: `member-3/organizers-accounts`
 
 ## งานหลัก (ขั้นที่ 2)
 
-1. **Organizer CRUD (ADMIN)** — list / view / create / update / delete + หน้า "กิจกรรมของผู้จัดนี้" ใช้โครงเดียวกับ Category ของคนที่ 2 · ลบได้เฉพาะผู้จัดที่ไม่มีกิจกรรม
-2. **สมัครสมาชิก (public)** — ฟอร์มชื่อ / อีเมล / รหัสผ่าน / ยืนยันรหัสผ่าน
-   - validation: `email` unique, `password` min:4 + confirmed
-   - สร้างด้วย `new User([...])` แล้ว `$user->email = ...`, `$user->role = User::ROLE_USER` (**ห้ามรับ role จากฟอร์ม** แม้มีคนแอบส่ง `role=ADMIN` มา)
+1. **Organizer CRUD** — list / view / create / update / delete + หน้า "กิจกรรมของผู้จัดนี้" โครงเดียวกับ Category ของคนที่ 2 (ดู: ทุกคนที่ login · สร้าง/แก้/ลบ: ADMIN · ลบได้เฉพาะผู้จัดที่ไม่มีกิจกรรม) · ไม่ใช้ `Validator` · ปุ่ม Back/Cancel ใช้ bookmarks
+2. **สมัครสมาชิก (public)** — เขียนแบบ `UserController::create` ใน Lab 13 (ไม่ใช้ `Validator`)
+   - ฟอร์ม: อีเมล (`type="email"`), รหัสผ่าน, ชื่อ — ทุกช่อง `required` · ไม่มีช่องเลือก role
+   - ใน `try`: `new User($data)` แล้ว `$user->email = $data['email']`, `$user->role = 'USER'` (**ต่างจากคาบ: ล็อกเป็น USER เสมอ ห้ามรับ role จากฟอร์ม** แม้มีคนแอบส่ง `role=ADMIN` มา) แล้ว `save()`
+   - อีเมลซ้ำ → `QueryException` → กล่องแดง `Duplicate entry ...` · คืนค่าฟอร์มด้วย `withInput()` แต่ **ไม่คืนรหัสผ่าน**
    - `Auth::login($user)` + `session()->regenerate()` แล้วพาไปหน้ารายการกิจกรรม
    - หน้า login / สมัครสมาชิกใช้ middleware `guest` (login แล้วเข้าไม่ได้)
 3. **หน้าแรก (public)** — กิจกรรมที่ใกล้จะจัด 6 รายการ (การ์ด), ตัวเลขสรุป, ปุ่มหมวดหมู่ที่ลิงก์ไป `activities.list?category=...`
 4. **กิจกรรมของฉัน (USER)** — `$user->activities()` แยกแท็บ "กำลังจะมาถึง" / "ที่ผ่านมาแล้ว" · มีลิงก์บัตร PDF · ADMIN เข้าแล้วได้ 403
-5. **ข้อความ validation ภาษาไทย** — `lang/th/validation.php` (required, email, unique, exists, min, max, confirmed …) + ชื่อช่องภาษาไทยใน `attributes`
+5. (ไม่บังคับ) **ข้อความ validation ของ login เป็นภาษาไทย** — `lang/th/validation.php` (`required`, `email`) — CRUD ไม่ได้ใช้ `Validator` แล้ว
 6. ดูแลการรวม `routes/web.php` และ layout เมื่อเพื่อนขอเพิ่มเมนู
 
 ## ไฟล์ที่รับผิดชอบ
@@ -58,7 +59,7 @@ Branch: `member-3/organizers-accounts`
 | `resources/views/layouts/main.blade.php` | layout หลัก |
 | `resources/views/logins/*`, `registers/*`, `organizers/*`, `home.blade.php`, `my-activities/*` | หน้าของตัวเอง |
 | `routes/web.php`, `routes/auth.php`, `routes/organizers.php`, `routes/my-activities.php` | routes |
-| `lang/th/validation.php`, `lang/th/pagination.php` | ข้อความภาษาไทย |
+| `lang/th/*` (ไม่บังคับ) | ข้อความภาษาไทยของ login / pagination |
 | `README.md` (ราก repo) | วิธีติดตั้ง + บัญชีทดสอบ |
 
 ## Routes
@@ -72,15 +73,15 @@ Branch: `member-3/organizers-accounts`
 | POST `/auth/register` | `register` | สร้างบัญชี role USER | Guest |
 | POST `/auth/logout` | `logout` | ออกจากระบบ | login แล้ว |
 | GET `/my-activities` | `my-activities.list` | กิจกรรมของฉัน | USER |
-| `/organizers/...` | `organizers.list`, `.view`, `.create-form`, `.create`, `.update-form`, `.update`, `.delete`, `.view-activities` | เหมือน `/categories` | ADMIN |
+| `/organizers/...` | `organizers.index`, `.list`, `.view`, `.create-form`, `.create`, `.update-form`, `.update`, `.delete`, `.view-activities` | เหมือน `/categories` (`GET /organizers/list` + `ANY /organizers` → redirect) | ดู: ทุกคนที่ login · แก้: ADMIN |
 
-## Validation
+## การตรวจข้อมูล
 
-| ฟอร์ม | กฎ |
+| ฟอร์ม | ตรวจอย่างไร |
 |---|---|
-| Login | `email`: required, email · `password`: required · ผิด → "อีเมลหรือรหัสผ่านไม่ถูกต้อง" (คืนค่า email ได้ **ไม่คืน password**) |
-| สมัครสมาชิก | `name`: required, max:255 · `email`: required, email, unique:users · `password`: required, min:4, confirmed |
-| Organizer | `code`: required, max:64, unique (ยกเว้นตัวเองตอน update) · `name`, `contact`: required, max:255 |
+| Login | `Validator` (เหมือนในคาบ — ที่เดียวที่ใช้) `email`, `password` required · ผิด → "อีเมลหรือรหัสผ่านไม่ถูกต้อง" (คืนค่า email ได้ **ไม่คืน password**) |
+| สมัครสมาชิก | แบบ `UserController::create`: HTML `required` + `type="email"` · อีเมลซ้ำ → error จากฐานข้อมูล (unique) ผ่าน `try/catch` |
+| Organizer | แบบ `CategoryController`: HTML `required` · code ซ้ำ → error จากฐานข้อมูล ผ่าน `try/catch` |
 
 ## รับ / ส่งต่อ
 
@@ -96,10 +97,11 @@ Branch: `member-3/organizers-accounts`
 - [ ] รหัสผิด → ข้อความ error, ช่อง email ยังมีค่า, ช่อง password ว่าง
 - [ ] เข้าหน้าที่ต้อง login ตอนยังไม่ login → ไป login → login แล้วกลับมาหน้าเดิม (`intended`)
 - [ ] สมัครสมาชิกได้ แล้ว login ให้อัตโนมัติ · ในฐานข้อมูล role = `USER` แม้ส่ง `role=ADMIN` มาเอง
-- [ ] สมัครด้วยอีเมลซ้ำ / รหัสไม่ตรงกัน → error ภาษาไทยใต้ช่อง
+- [ ] สมัครด้วยอีเมลซ้ำ → กล่องแดง `Duplicate entry ...` · ช่องชื่อ/อีเมลยังมีค่า ช่องรหัสผ่านว่าง
 - [ ] login แล้วเปิด `/auth/login` หรือ `/auth/register` → ถูกพาไปหน้าแรก
-- [ ] Guest เปิดหน้าแรกได้ · เมนูแสดง "เข้าสู่ระบบ / สมัครสมาชิก" · USER เห็น "กิจกรรมของฉัน" · ADMIN เห็น "หมวดหมู่ / ผู้จัด"
+- [ ] Guest เปิดหน้าแรกได้ · เมนูแสดง "เข้าสู่ระบบ / สมัครสมาชิก" · USER เห็น "กิจกรรมของฉัน", "หมวดหมู่", "ผู้จัด" · ADMIN เห็น "หมวดหมู่ / ผู้จัด" (ไม่มี "กิจกรรมของฉัน")
 - [ ] ADMIN สร้าง / ดู / แก้ / ลบ Organizer ได้ · OG001 ลบไม่ได้ · OG004 ลบได้
+- [ ] USER เห็นเมนูผู้จัด ดูได้แต่ไม่มีปุ่มแก้ · พิมพ์ `/organizers/create` เองได้ 403
 - [ ] USER เห็นกิจกรรมของฉันถูกต้องทั้ง 2 แท็บ · ADMIN เปิด `/my-activities` ได้ 403
 
 ## สิ่งที่ต้องอธิบายในรายงานและ demo

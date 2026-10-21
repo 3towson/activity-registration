@@ -26,17 +26,19 @@ Branch: `member-2/categories-css-pdf`
 
 ## งานหลัก (ขั้นที่ 2)
 
-### ก. Category CRUD (ADMIN เท่านั้น)
+### ก. Category CRUD (ดู: ทุกคนที่ login · สร้าง/แก้/ลบ: ADMIN — เหมือน `CategoryPolicy` ในคาบ)
 
 1. list (ค้นหา + แบ่งหน้า + จำนวนกิจกรรม `withCount('activities')`), view, create, update, delete
-2. validation + `try/catch QueryException` + ข้อความ `status` / `alert` ทุก action
+2. `required` ใน HTML + `try/catch QueryException` + ข้อความ `status` / `alert` ทุก action (ไม่ใช้ `Validator`)
+3. ปุ่ม Back / Cancel ใช้ bookmarks แบบ Lab 11 (ดูตัวอย่างใน `categories/list`, `view`, `create-form` ของ my-db)
 3. ปุ่ม Delete โผล่เฉพาะหมวดที่ไม่มีกิจกรรม (`@can('delete', $category)`) และกันที่ controller ด้วย `Gate::authorize('delete', ...)`
 4. หน้า "กิจกรรมในหมวดนี้" — ใช้ `$category->activities()` + ยืม `filter()` ของ `ActivityController` ผ่าน `\resolve(ActivityController::class)` (แบบเดียวกับหน้า `view-products` ของ Category ในคาบ) และ `@include('activities.table')` ของคนที่ 1
 
 ### ข. CSS ทั้งเว็บ (R5)
 
 - ทุกหน้าใช้ไฟล์เดียวผ่าน layout หลัก · ชื่อ class `app-cmp-*` / `app-cl-*`
-- ต้องครอบคลุม: หน้าแรก (การ์ดกิจกรรม), ตาราง, ฟอร์ม + ข้อความ error ใต้ช่อง, ป้ายสถานะ (เปิดรับ / เต็มแล้ว / จบแล้ว), กล่องสมัคร, pagination, เมนูที่ active
+- ชื่อ class ตาม `lec04-styles.css` (ตั้งไว้แล้วในฐานร่วม) — view ของทุกคนจึงเขียน class เหมือนในคาบได้เลย
+- ต้องครอบคลุม: หน้าแรก (การ์ดกิจกรรม), ตาราง, ฟอร์ม, ป้ายสถานะ (เปิดรับ / เต็มแล้ว / จบแล้ว), กล่องสมัคร, pagination, เมนูที่ active
 - ใช้ได้บนมือถือ (`@media (max-width: 760px)`) — ตาราง/ฟอร์มไม่ล้นจอ
 - ไม่ใช้ CSS framework (ถ้าอยากใช้ ต้องถามอาจารย์ก่อน)
 
@@ -92,7 +94,7 @@ function download(string $activityCode): Response
 | `app/Models/Category.php` | `activities()` |
 | `app/Http/Controllers/SearchableController.php` | คลาสแม่ค้นหา/แบ่งหน้า |
 | `app/Http/Controllers/CategoryController.php` | Category CRUD + viewActivities |
-| `app/Policies/CategoryPolicy.php` | ADMIN เท่านั้น · delete เมื่อไม่มีกิจกรรม |
+| `app/Policies/CategoryPolicy.php` | list/view = `true` (ทุกคนที่ login) · create/update = ADMIN · delete = ADMIN + ไม่มีกิจกรรม |
 | `resources/views/categories/*` | main, list, view, form-fields, create-form, update-form, view-activities |
 | `app/Http/Controllers/TicketController.php` | ดาวน์โหลดบัตร PDF |
 | `resources/views/tickets/pdf.blade.php` | หน้าตาบัตร |
@@ -105,25 +107,22 @@ function download(string $activityCode): Response
 
 | Method / URL | Name | ทำอะไร | สิทธิ์ |
 |---|---|---|---|
-| GET `/categories` | `categories.list` | รายการ + ค้นหา + แบ่งหน้า | ADMIN |
-| GET `/categories/create` | `categories.create-form` | ฟอร์มสร้าง | ADMIN |
+| GET `/categories/list` | `categories.list` | รายการ + ค้นหา + แบ่งหน้า | ทุกคนที่ login |
+| ANY `/categories` | `categories.index` | redirect → list (เมนูลิงก์มาที่นี่) | ทุกคนที่ login |
 | POST `/categories` | `categories.create` | บันทึกใหม่ | ADMIN |
-| GET `/categories/{category}` | `categories.view` | รายละเอียด | ADMIN |
-| GET `/categories/{category}/update` | `categories.update-form` | ฟอร์มแก้ไข | ADMIN |
+| GET `/categories/create` | `categories.create-form` | ฟอร์มสร้าง | ADMIN |
+| GET `/categories/{category}` | `categories.view` | รายละเอียด | ทุกคนที่ login |
 | POST `/categories/{category}` | `categories.update` | บันทึกแก้ไข | ADMIN |
+| GET `/categories/{category}/update` | `categories.update-form` | ฟอร์มแก้ไข | ADMIN |
 | POST `/categories/{category}/delete` | `categories.delete` | ลบ (เฉพาะหมวดว่าง) | ADMIN |
-| GET `/categories/{category}/activities` | `categories.view-activities` | กิจกรรมในหมวด | ADMIN |
+| GET `/categories/{category}/activities` | `categories.view-activities` | กิจกรรมในหมวด | ทุกคนที่ login |
 | GET `/activities/{activity}/ticket` | `activities.ticket` | ดาวน์โหลดบัตร PDF | USER ที่สมัครแล้ว |
 
-`/create` ต้องประกาศก่อน `/{category}` · ทั้งไฟล์ครอบด้วย middleware `auth`
+เขียนตามโครง `/categories` ใน `web.php` ของ my-db (มีตัวอย่างในคอมเมนต์ของ `routes/categories.php`) · `/create` ต้องประกาศก่อน `/{category}` · ทั้งไฟล์ครอบด้วย middleware `auth`
 
-## Validation
+## การตรวจข้อมูล (แบบในคาบ — ไม่ใช้ Validator)
 
-| ช่อง | กฎ |
-|---|---|
-| `code` | required, max:64, `Rule::unique('categories','code')->ignore($category?->id)` |
-| `name` | required, max:255 |
-| `description` | required |
+เหมือน `CategoryController` ใน my-db ทุกอย่าง: `Category::create($request->getParsedBody())` ใน `try` · ฟอร์มใช้ `required` · code ซ้ำ → `QueryException` → กล่องแดง `Duplicate entry ...` · ฟอร์มเติมค่าเดิมด้วย `old()`
 
 ## รับ / ส่งต่อ
 
@@ -134,9 +133,11 @@ function download(string $activityCode): Response
 
 ## Checklist ว่างานเสร็จ
 
-- [ ] Guest เปิด `/categories` ถูกพาไป login · USER เปิด / ส่ง POST เองได้ 403
+- [ ] Guest เปิด `/categories` ถูกพาไป login
 - [ ] ADMIN สร้าง / ดู / แก้ / ลบหมวดได้ และมีข้อความสำเร็จทุกครั้ง
-- [ ] code ซ้ำ / ชื่อว่าง → error ใต้ช่อง และค่าที่กรอกยังอยู่
+- [ ] ช่องว่างกดส่งไม่ได้ (`required`) · code ซ้ำ → กล่องแดงจากฐานข้อมูล และค่าที่กรอกยังอยู่
+- [ ] USER เห็นเมนูหมวดหมู่ ดูรายการ/รายละเอียดได้ แต่ไม่เห็นปุ่มสร้าง/แก้/ลบ · พิมพ์ `/categories/create` เองได้ 403
+- [ ] ปุ่ม Back / Cancel กลับหน้ารายการเดิมพร้อมคำค้น (bookmarks)
 - [ ] CT001 (มีกิจกรรม) ไม่มีปุ่มลบ และส่ง POST ลบเองได้ 403 · CT004 ลบได้
 - [ ] ค้นหา 2 คำพร้อมกันได้ · เปลี่ยนหน้าแล้วคำค้นไม่หาย
 - [ ] หน้า "กิจกรรมในหมวด" แสดงเฉพาะกิจกรรมของหมวดนั้น

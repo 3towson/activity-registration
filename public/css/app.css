@@ -3,32 +3,44 @@
  * โหลดใน layouts/main.blade.php ที่เดียว ทุกหน้าจึงใช้สไตล์เดียวกัน
  * เจ้าของ: คนที่ 2 — ถ้าต้องการ class ใหม่ ให้บอกคนที่ 2
  *
- * ชื่อ class ตามแบบในคาบ:
- *   app-cmp-*  = component (ชิ้นส่วนของหน้า เช่น app-cmp-data-list)
- *   app-cl-*   = class เสริม (เช่น app-cl-danger, app-cl-number)
+ * ชื่อ class ใช้ชุดเดียวกับ lec04-styles.css ที่เรียนในคาบ เพื่อให้ view เขียนเหมือน my-db:
+ *   app-cmp-*  = component (ชิ้นส่วนของหน้า)  เช่น app-cmp-data-list, app-cmp-data-form, app-cmp-data-detail
+ *   app-cl-*   = class เสริม                  เช่น app-cl-button app-cl-filled app-cl-primary, app-cl-active
+ *
+ * ปุ่ม (เหมือนในคาบ):
+ *   <a class="app-cl-button app-cl-primary">          ปุ่มขอบน้ำเงิน (เช่น < Back)
+ *   <a class="app-cl-button app-cl-filled app-cl-primary">  ปุ่มทึบน้ำเงิน (เช่น Create, Update)
+ *   <a class="app-cl-button app-cl-filled app-cl-warning">  ปุ่มทึบแดง   (เช่น Delete, Cancel, Clear)
  */
 
 /* ---------- 1. ตัวแปรสี / ขนาด ---------- */
 :root {
-    --c-ink: #1d2a2e;
-    --c-muted: #5b6b70;
-    --c-line: #dfe3dc;
-    --c-paper: #f6f4ee;
-    --c-surface: #ffffff;
-    --c-primary: #0f5c63;
-    --c-primary-dark: #0a4449;
-    --c-primary-soft: #e3f0ef;
-    --c-accent: #e8a33d;
-    --c-accent-soft: #fbe9c9;
+    --app-gap: 8px;
 
-    --c-ok: #1f7a4d;
-    --c-ok-soft: #e2f3e9;
-    --c-error: #b42318;
-    --c-error-soft: #fde8e6;
+    --app-on-surface: #1d2a2e;
+    --app-muted: #5b6b70;
+    --app-line: #dfe3dc;
+    --app-background: #f6f4ee;
+    --app-surface: #ffffff;
 
-    --radius: 10px;
-    --shadow: 0 1px 2px rgb(16 40 44 / 6%), 0 4px 16px rgb(16 40 44 / 6%);
-    --font: 'IBM Plex Sans Thai', 'Sarabun', 'Tahoma', sans-serif;
+    --app-primary: #0f5c63;
+    --app-primary-dark: #0a4449;
+    --app-primary-soft: #e3f0ef;
+    --app-on-primary: #ffffff;
+
+    --app-warning: #b42318;
+    --app-warning-soft: #fde8e6;
+    --app-on-warning: #ffffff;
+
+    --app-success: #1f7a4d;
+    --app-success-soft: #e2f3e9;
+
+    --app-accent: #e8a33d;
+
+    --app-radius: 10px;
+    --app-shadow: 0 1px 2px rgb(16 40 44 / 6%), 0 4px 16px rgb(16 40 44 / 6%);
+    --app-plain-text-font: 'IBM Plex Sans Thai', 'Sarabun', 'Tahoma', sans-serif;
+    --app-monospace-font: ui-monospace, 'Cascadia Mono', Consolas, monospace;
 }
 
 /* ---------- 2. พื้นฐาน ---------- */
@@ -38,28 +50,24 @@
     box-sizing: border-box;
 }
 
-html {
-    font-size: 16px;
-}
-
 body {
     margin: 0;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: var(--c-paper);
-    color: var(--c-ink);
-    font-family: var(--font);
+    background: var(--app-background);
+    color: var(--app-on-surface);
+    font-family: var(--app-plain-text-font);
     line-height: 1.6;
 }
 
 a {
-    color: var(--c-primary);
+    color: var(--app-primary);
     text-underline-offset: 3px;
 }
 
 a:hover {
-    color: var(--c-primary-dark);
+    color: var(--app-primary-dark);
 }
 
 h1,
@@ -70,20 +78,33 @@ h3 {
 }
 
 small {
-    color: var(--c-muted);
+    color: var(--app-muted);
+}
+
+pre {
+    margin: 0;
+    font-family: inherit;
+    white-space: pre-wrap; /* แสดงข้อความหลายบรรทัด (description) ตามที่เก็บในฐานข้อมูล */
+}
+
+code {
+    padding: 0.05rem 0.35rem;
+    border-radius: 4px;
+    background: #eef1ec;
+    font-size: 0.9em;
 }
 
 /* ---------- 3. Header + เมนูหลัก ---------- */
 #app-main-header {
-    background: var(--c-primary);
-    color: #fff;
+    background: var(--app-primary);
+    color: var(--app-on-primary);
     position: sticky;
     top: 0;
     z-index: 10;
     box-shadow: 0 2px 10px rgb(0 0 0 / 12%);
 }
 
-.app-cmp-header-bar {
+#app-main-header > nav {
     max-width: 1120px;
     margin: 0 auto;
     padding: 0.6rem 1.25rem;
@@ -98,24 +119,20 @@ small {
     font-weight: 700;
     font-size: 1.15rem;
     text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
 }
 
 .app-cmp-brand:hover {
-    color: var(--c-accent-soft);
+    color: #fbe9c9;
 }
 
-.app-cmp-brand-mark {
-    color: var(--c-accent);
+.app-cmp-brand::before {
+    content: '✦ ';
+    color: var(--app-accent);
 }
 
-.app-cmp-main-nav {
+/* เมนูหลัก: <ul class="app-cmp-links"> + <li class="app-cl-active"> (แบบในคาบ) */
+#app-main-header .app-cmp-links {
     flex: 1;
-}
-
-.app-cmp-main-nav ul {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -124,7 +141,7 @@ small {
     flex-wrap: wrap;
 }
 
-.app-cmp-main-nav a {
+#app-main-header .app-cmp-links a {
     display: block;
     padding: 0.35rem 0.8rem;
     border-radius: 999px;
@@ -133,24 +150,24 @@ small {
     font-weight: 500;
 }
 
-.app-cmp-main-nav a:hover {
+#app-main-header .app-cmp-links a:hover {
     color: #fff;
     background: rgb(255 255 255 / 10%);
 }
 
-.app-cmp-main-nav a.active {
-    color: var(--c-primary-dark);
+#app-main-header .app-cmp-links .app-cl-active a {
+    color: var(--app-primary-dark);
     background: #fff;
 }
 
+/* แผงผู้ใช้: ชื่อ + role + Logout / เข้าสู่ระบบ */
 .app-cmp-user-panel {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     align-items: center;
     gap: 0.6rem;
-}
-
-.app-cmp-user-name {
-    font-weight: 500;
 }
 
 .app-cmp-role {
@@ -163,23 +180,23 @@ small {
 }
 
 .app-cmp-role.app-cl-admin {
-    background: var(--c-accent);
-    color: var(--c-ink);
-}
-
-#app-main-header .app-cl-ghost {
-    color: #fff;
-    border-color: rgb(255 255 255 / 45%);
-}
-
-#app-main-header .app-cl-ghost:hover {
-    background: rgb(255 255 255 / 12%);
+    background: var(--app-accent);
+    color: var(--app-on-surface);
 }
 
 #app-main-header .app-cl-button {
-    background: var(--c-accent);
-    border-color: var(--c-accent);
-    color: var(--c-ink);
+    border-color: rgb(255 255 255 / 45%);
+    color: #fff;
+}
+
+#app-main-header .app-cl-button:hover {
+    background: rgb(255 255 255 / 12%);
+}
+
+#app-main-header .app-cl-button.app-cl-filled {
+    background: var(--app-accent);
+    border-color: var(--app-accent);
+    color: var(--app-on-surface);
 }
 
 /* ---------- 4. เนื้อหาหลัก ---------- */
@@ -201,18 +218,33 @@ small {
 }
 
 .app-cmp-lead {
-    font-size: 1.1rem;
-    color: var(--c-muted);
+    font-size: 1.05rem;
+    color: var(--app-muted);
     max-width: 48rem;
     margin: 0 0 1rem;
 }
 
+.app-cmp-section {
+    margin-bottom: 2.5rem;
+}
+
+.app-cmp-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.app-cmp-hint {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--app-muted);
+}
+
 #app-main-footer {
     text-align: center;
-    color: var(--c-muted);
+    color: var(--app-muted);
     font-size: 0.85rem;
     padding: 1.25rem;
-    border-top: 1px solid var(--c-line);
+    border-top: 1px solid var(--app-line);
 }
 
 /* ---------- 5. ข้อความแจ้งเตือน (session) ---------- */
@@ -222,14 +254,14 @@ small {
 
 .app-cmp-notifications {
     display: grid;
-    gap: 0.5rem;
+    gap: var(--app-gap);
     margin-bottom: 1rem;
 }
 
 [role='status'],
 [role='alert'] {
     padding: 0.7rem 1rem 0.7rem 2.6rem;
-    border-radius: var(--radius);
+    border-radius: var(--app-radius);
     border: 1px solid;
     position: relative;
     font-weight: 500;
@@ -244,9 +276,9 @@ small {
 
 /* สำเร็จ = เขียว */
 [role='status'] {
-    background: var(--c-ok-soft);
+    background: var(--app-success-soft);
     border-color: #a7dcc0;
-    color: var(--c-ok);
+    color: var(--app-success);
 }
 
 [role='status']::before {
@@ -255,29 +287,27 @@ small {
 
 /* ผิดพลาด = แดง */
 [role='alert'] {
-    background: var(--c-error-soft);
+    background: var(--app-warning-soft);
     border-color: #f5b8b2;
-    color: var(--c-error);
+    color: var(--app-warning);
 }
 
 [role='alert']::before {
     content: '!';
 }
 
-/* ---------- 6. ปุ่ม / ลิงก์แบบปุ่ม ---------- */
+/* ---------- 6. ปุ่ม (app-cl-button + app-cl-filled + app-cl-primary / app-cl-warning) ---------- */
 button,
-.app-cl-button,
-.app-cl-ghost,
-.app-cmp-links a {
+.app-cl-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.3rem;
     padding: 0.45rem 1rem;
     border-radius: 8px;
-    border: 1px solid var(--c-primary);
-    background: var(--c-primary);
-    color: #fff;
+    border: 1px solid var(--app-primary);
+    background: transparent;
+    color: var(--app-primary);
     font: inherit;
     font-weight: 500;
     line-height: 1.4;
@@ -287,41 +317,38 @@ button,
 }
 
 button:hover,
-.app-cl-button:hover,
-.app-cmp-links a:hover {
-    background: var(--c-primary-dark);
-    border-color: var(--c-primary-dark);
-    color: #fff;
+.app-cl-button:hover {
+    background: var(--app-primary-soft);
+    color: var(--app-primary-dark);
 }
 
-.app-cl-ghost,
-.app-cmp-links a.app-cl-ghost {
-    background: transparent;
-    color: var(--c-primary);
+.app-cl-button.app-cl-warning {
+    border-color: var(--app-warning);
+    color: var(--app-warning);
 }
 
-.app-cl-ghost:hover,
-.app-cmp-links a.app-cl-ghost:hover {
-    background: var(--c-primary-soft);
-    color: var(--c-primary-dark);
+.app-cl-button.app-cl-warning:hover {
+    background: var(--app-warning-soft);
 }
 
-.app-cl-danger,
-button.app-cl-danger {
-    background: var(--c-surface);
-    border-color: var(--c-error);
-    color: var(--c-error);
+.app-cl-button.app-cl-filled.app-cl-primary {
+    background: var(--app-primary);
+    color: var(--app-on-primary);
 }
 
-button.app-cl-danger:hover {
-    background: var(--c-error);
-    border-color: var(--c-error);
-    color: #fff;
+.app-cl-button.app-cl-filled.app-cl-primary:hover {
+    background: var(--app-primary-dark);
+    border-color: var(--app-primary-dark);
 }
 
-.app-cl-block {
-    display: flex;
-    width: 100%;
+.app-cl-button.app-cl-filled.app-cl-warning {
+    background: var(--app-warning);
+    color: var(--app-on-warning);
+}
+
+.app-cl-button.app-cl-filled.app-cl-warning:hover {
+    background: #8f1c13;
+    border-color: #8f1c13;
 }
 
 button:focus-visible,
@@ -329,40 +356,37 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-    outline: 3px solid var(--c-accent);
+    outline: 3px solid var(--app-accent);
     outline-offset: 2px;
 }
 
-/* ---------- 7. แถบลิงก์ + pagination ---------- */
-.app-cmp-links-bar {
+/* ---------- 7. แถบลิงก์ + ปุ่มของฟอร์ม + pagination ---------- */
+.app-cmp-links-bar,
+.app-cmp-form-actions {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    gap: var(--app-gap);
     flex-wrap: wrap;
     margin-top: 1rem;
 }
 
-.app-cmp-links {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
+.app-cmp-links-bar .ui.pagination.menu {
+    margin-left: auto;
 }
 
-.app-cmp-links form {
-    display: none; /* ฟอร์มว่างสำหรับปุ่ม form="..." */
+/* ปุ่มรอง (Cancel / Clear) ชิดขวาในแถวปุ่ม แบบในคาบ */
+.app-cmp-form-secondary-actions {
+    margin-left: auto;
+    display: flex;
+    gap: var(--app-gap);
 }
 
 /* pagination::semantic-ui ของ Laravel */
 .ui.pagination.menu {
     display: inline-flex;
-    border: 1px solid var(--c-line);
+    border: 1px solid var(--app-line);
     border-radius: 8px;
-    background: var(--c-surface);
+    background: var(--app-surface);
     overflow: hidden;
 }
 
@@ -371,8 +395,8 @@ textarea:focus-visible {
     padding: 0.35rem 0.7rem;
     text-align: center;
     text-decoration: none;
-    color: var(--c-ink);
-    border-left: 1px solid var(--c-line);
+    color: var(--app-on-surface);
+    border-left: 1px solid var(--app-line);
 }
 
 .ui.pagination.menu .item:first-child {
@@ -380,12 +404,12 @@ textarea:focus-visible {
 }
 
 .ui.pagination.menu .item:hover {
-    background: var(--c-primary-soft);
+    background: var(--app-primary-soft);
 }
 
 .ui.pagination.menu .item.active {
-    background: var(--c-primary);
-    color: #fff;
+    background: var(--app-primary);
+    color: var(--app-on-primary);
     font-weight: 600;
 }
 
@@ -404,40 +428,40 @@ textarea:focus-visible {
     font-style: normal;
 }
 
-/* ---------- 8. ฟอร์มค้นหา ---------- */
-.app-cmp-search-form {
+/* ---------- 8. ฟอร์มค้นหา: <search><form class="app-cmp-search-form"><fieldset><legend> ---------- */
+.app-cmp-search-form fieldset {
+    margin: 0;
+    padding: 1rem;
     display: flex;
     align-items: flex-end;
     gap: 0.75rem 1rem;
     flex-wrap: wrap;
-    padding: 1rem;
-    background: var(--c-surface);
-    border: 1px solid var(--c-line);
-    border-radius: var(--radius);
+    background: var(--app-surface);
+    border: 1px solid var(--app-line);
+    border-radius: var(--app-radius);
+}
+
+.app-cmp-search-form legend {
+    padding: 0 0.4rem;
+    font-weight: 600;
+    color: var(--app-muted);
 }
 
 .app-cmp-search-form label {
+    flex: 1 1 14rem;
     display: grid;
     gap: 0.2rem;
+}
+
+.app-cmp-search-form label > b {
     font-size: 0.85rem;
-    color: var(--c-muted);
+    font-weight: 500;
+    color: var(--app-muted);
 }
 
-.app-cmp-search-form label:first-child {
-    flex: 1 1 18rem;
-}
-
-.app-cmp-search-form .app-cmp-check {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding-bottom: 0.55rem;
-    color: var(--c-ink);
-}
-
-.app-cmp-search-actions {
-    display: flex;
-    gap: 0.5rem;
+.app-cmp-search-form .app-cmp-form-actions {
+    margin-top: 0;
+    flex: 1 1 14rem;
 }
 
 /* ---------- 9. ช่องกรอกข้อมูล ---------- */
@@ -454,7 +478,7 @@ textarea {
     border: 1px solid #c9d0cb;
     border-radius: 8px;
     background: #fff;
-    color: var(--c-ink);
+    color: var(--app-on-surface);
     font: inherit;
 }
 
@@ -466,86 +490,49 @@ textarea {
     resize: vertical;
 }
 
-input[type='checkbox'] {
-    width: 1.1rem;
-    height: 1.1rem;
-    accent-color: var(--c-primary);
-}
-
-/* ---------- 10. ฟอร์มสร้าง/แก้ไข ---------- */
-.app-cmp-form {
+/* ---------- 10. ฟอร์มสร้าง/แก้ไข: <form class="app-cmp-data-form"> ---------- */
+.app-cmp-data-form {
     max-width: 52rem;
-    padding: 1.5rem;
-    background: var(--c-surface);
-    border: 1px solid var(--c-line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-}
-
-.app-cmp-auth-form {
-    max-width: 26rem;
     display: grid;
     gap: 1rem;
+    padding: 1.5rem;
+    background: var(--app-surface);
+    border: 1px solid var(--app-line);
+    border-radius: var(--app-radius);
+    box-shadow: var(--app-shadow);
 }
 
-.app-cmp-form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem 1.25rem;
-}
-
-.app-cmp-form label {
+.app-cmp-data-form label {
     display: grid;
     gap: 0.25rem;
-    align-content: start;
-}
-
-.app-cmp-form label > span {
     font-weight: 500;
     font-size: 0.92rem;
 }
 
-.app-cmp-form label > span b {
-    color: var(--c-error);
-}
-
-.app-cl-wide {
-    grid-column: 1 / -1;
-}
-
-.app-cmp-field-error {
-    color: var(--c-error);
-    font-weight: 500;
-}
-
-.app-cmp-field-hint {
-    color: var(--c-muted);
-}
-
-.app-cmp-form-actions {
-    display: flex;
-    gap: 0.6rem;
-    margin-top: 1.25rem;
-}
-
-.app-cmp-auth-form .app-cmp-form-actions {
+.app-cmp-data-form .app-cmp-form-actions {
     margin-top: 0.25rem;
 }
 
-/* ---------- 11. ตารางรายการ ---------- */
+/* ใช้ใต้ช่องกรอกในฟอร์ม login (ที่ยังใช้ Validator) */
+.app-cmp-field-error {
+    color: var(--app-warning);
+    font-weight: 500;
+}
+
+/* ---------- 11. ตารางรายการ: <table class="app-cmp-data-list"> ---------- */
 .app-cmp-data-list {
     width: 100%;
     border-collapse: collapse;
-    background: var(--c-surface);
-    border-radius: var(--radius);
+    background: var(--app-surface);
+    border-radius: var(--app-radius);
     overflow: hidden;
-    box-shadow: var(--shadow);
+    box-shadow: var(--app-shadow);
 }
 
 .app-cmp-data-list caption {
     text-align: left;
     padding: 0 0 0.5rem;
-    color: var(--c-muted);
+    color: var(--app-muted);
     font-size: 0.9rem;
 }
 
@@ -553,14 +540,14 @@ input[type='checkbox'] {
 .app-cmp-data-list td {
     padding: 0.65rem 0.9rem;
     text-align: left;
-    border-bottom: 1px solid var(--c-line);
+    border-bottom: 1px solid var(--app-line);
 }
 
 .app-cmp-data-list thead th {
     background: #eef1ec;
     font-size: 0.85rem;
     font-weight: 600;
-    color: var(--c-muted);
+    color: var(--app-muted);
 }
 
 .app-cmp-data-list tbody tr:last-child > * {
@@ -571,10 +558,41 @@ input[type='checkbox'] {
     background: #fafbf8;
 }
 
-.app-cmp-data-list tbody th a {
-    font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+/* ---------- 12. หน้ารายละเอียด: <dl class="app-cmp-data-detail"> ---------- */
+.app-cmp-data-detail {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 0.5rem 1rem;
+    max-width: 52rem;
+    margin: 0 0 1rem;
+    padding: 1.5rem;
+    background: var(--app-surface);
+    border: 1px solid var(--app-line);
+    border-radius: var(--app-radius);
+    box-shadow: var(--app-shadow);
+}
+
+.app-cmp-data-detail dt {
+    color: var(--app-muted);
+}
+
+.app-cmp-data-detail dd {
+    margin: 0;
+    font-weight: 500;
+}
+
+/* ---------- 13. class เสริม ---------- */
+.app-cl-code {
+    font-family: var(--app-monospace-font);
     font-weight: 600;
+}
+
+.app-cl-link {
     text-decoration: none;
+}
+
+.app-cl-link:hover {
+    text-decoration: underline;
 }
 
 .app-cl-number {
@@ -586,54 +604,18 @@ input[type='checkbox'] {
     white-space: nowrap;
 }
 
-.app-cmp-empty {
-    padding: 2rem;
-    text-align: center;
-    color: var(--c-muted);
-    background: var(--c-surface);
-    border: 1px dashed var(--c-line);
-    border-radius: var(--radius);
-}
-
-.app-cmp-summary {
-    margin: 0 0 1rem;
-}
-
-/* ---------- 12. ส่วนทั่วไป ---------- */
-.app-cmp-section {
-    margin-bottom: 2.5rem;
-}
-
-.app-cmp-section h2 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-}
-
-.app-cmp-hint {
-    margin: 0;
-    font-size: 0.88rem;
-    color: var(--c-muted);
-}
-
-code {
-    padding: 0.05rem 0.35rem;
-    border-radius: 4px;
-    background: #eef1ec;
-    font-size: 0.9em;
-}
-
 /*
- * ขั้นที่ 2 (คนที่ 2) เพิ่มต่อ: ป้ายสถานะ (เปิดรับ/เต็ม/จบแล้ว), หน้ารายละเอียด + กล่องสมัคร,
+ * ขั้นที่ 2 (คนที่ 2) เพิ่มต่อ: ป้ายสถานะ (เปิดรับ/เต็ม/จบแล้ว), หน้ารายละเอียดกิจกรรม + กล่องสมัคร,
  * การ์ดกิจกรรมหน้าแรก, แท็บ, ปุ่มหมวดหมู่
  */
 
-/* ---------- 13. หน้าจอเล็ก ---------- */
+/* ---------- 14. หน้าจอเล็ก ---------- */
 @media (max-width: 760px) {
-    .app-cmp-header-bar {
+    #app-main-header > nav {
         gap: 0.6rem;
     }
 
-    .app-cmp-main-nav {
+    #app-main-header .app-cmp-links {
         order: 3;
         flex-basis: 100%;
     }
@@ -642,8 +624,13 @@ code {
         margin-left: auto;
     }
 
-    .app-cmp-form-grid {
+    .app-cmp-data-detail {
         grid-template-columns: 1fr;
+        gap: 0.1rem;
+    }
+
+    .app-cmp-data-detail dd {
+        margin-bottom: 0.6rem;
     }
 
     .app-cmp-data-list {
