@@ -37,4 +37,16 @@ class Activity extends Model
     {
         return $this->belongsToMany(User::class)->withTimestamps();
     }
+
+    function isOpen(): bool
+    {
+        return $this->date->greaterThanOrEqualTo(today());
+    }
+
+    function isFull(): bool
+    {
+        $count = $this->participants_count ?? $this->participants()->count();
+
+        return $count >= $this->capacity;
+    }
 }
