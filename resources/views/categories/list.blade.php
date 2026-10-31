@@ -35,9 +35,16 @@
             </tr>
         </thead>
         <tbody>
+            @php
+                session()->put('bookmarks.categories.view', url()->full());
+            @endphp
             @foreach ($categories as $category)
                 <tr>
-                    <th class="app-cl-code">{{ $category->code }}</th>
+                    <th class="app-cl-code">
+                        <a href="{{ route('categories.view', ['category' => $category->code]) }}">
+                            {{ $category->code }}
+                        </a>
+                    </th>
                     <td>{{ $category->name }}</td>
                     <td class="app-cl-number">{{ $category->activities_count }}</td>
                 </tr>

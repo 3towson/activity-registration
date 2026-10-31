@@ -27,4 +27,14 @@ class CategoryController extends SearchableController
             'categories' => $query->paginate(self::MAX_ITEMS),
         ]);
     }
+
+    function view(string $categoryCode): View
+    {
+        $category = $this->find($categoryCode);
+        Gate::authorize('view', $category);
+
+        return view('categories.view', [
+            'category' => $category,
+        ]);
+    }
 }
