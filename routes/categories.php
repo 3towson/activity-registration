@@ -46,5 +46,9 @@ Route::controller(CategoryController::class)
 
         Route::prefix('/{category}')->group(static function (): void {
             Route::get('', 'view')->name('view');
+            Route::post('', 'update')->name('update');
+            Route::get('/update', 'showUpdateForm')->name('update-form');
+            Route::post('/delete', 'delete')->name('delete');
+            Route::get('/activities', 'viewActivities')->name('view-activities');
         });
     });

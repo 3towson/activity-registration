@@ -71,4 +71,73 @@ class CategoryController extends SearchableController
             ]);
         }
     }
+
+    function showUpdateForm(string $categoryCode): View
+    {
+        $category = $this->find($categoryCode);
+        Gate::authorize('update', $category);
+
+        return view('categories.update-form', [
+            'category' => $category,
+        ]);
+    }
+
+    function update(ServerRequestInterface $request, string $categoryCode): RedirectResponse
+    {
+        $category = $this->find($categoryCode);
+        Gate::authorize('update', $category);
+
+        try {
+            $category->fill($request->getParsedBody());
+            $category->save();
+
+            if (session()->has('bookmarks.categories.update')) {
+                session()->put(
+                    'bookmarks.categories.view',
+                    session()->get('bookmarks.categories.update'),
+                );
+            }
+
+            session()->forget('bookmarks.categories.update');
+
+            return redirect()
+                ->route('categories.view', ['category' => $category->code])
+                ->with('status', "Category {$category->code} was updated.");
+        } catch (QueryException $excp) {
+            return redirect()->back()->withInput()->withErrors([
+                'alert' => $excp->errorInfo[2],
+            ]);
+        }
+    }
+
+    function delete(string $categoryCode): RedirectResponse
+    {
+        $category = $this->find($categoryCode);
+        Gate::authorize('delete', $category);
+
+        try {
+            $category->delete();
+
+            return redirect(session()->get('bookmarks.categories.delete') ?? route('categories.index'))
+                ->with('status', "Category {$category->code} was deleted.");
+        } catch (QueryException $excp) {
+            return redirect()->back()->withErrors([
+                'alert' => $excp->errorInfo[2],
+            ]);
+        }
+    }
+
+    function viewActivities(string $categoryCode): View
+    {
+        $category = $this->find($categoryCode);
+        Gate::authorize('view', $category);
+
+        // ระหว่างที่ ActivityController ยังไม่เสร็จ: ยังไม่มีค้นหา (ดู docs/team/MEMBER_2.md)
+        $activities = $category->activities()->orderBy('code')->paginate(self::MAX_ITEMS);
+
+        return view('categories.view-activities', [
+            'category' => $category,
+            'activities' => $activities,
+        ]);
+    }
 }
