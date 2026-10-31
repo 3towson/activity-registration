@@ -22,6 +22,7 @@
         @can('create', \App\Models\Category::class)
             @php
                 session()->put('bookmarks.categories.create-form', url()->full());
+                session()->put('bookmarks.categories.create', url()->full());
             @endphp
             <a href="{{ route('categories.create-form') }}" class="app-cl-button app-cl-filled app-cl-primary">New Category</a>
         @endcan
