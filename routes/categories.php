@@ -41,7 +41,8 @@ Route::controller(CategoryController::class)
 
         Route::get('/list', 'list')->name('list');
         Route::any('', static fn() => redirect()->route("{$prefixName}list"))->name('index');
-
+        Route::post('', 'create')->name('create');
+        Route::get('/create', 'showCreateForm')->name('create-form');
 
         Route::prefix('/{category}')->group(static function (): void {
             Route::get('', 'view')->name('view');

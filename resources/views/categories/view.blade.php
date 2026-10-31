@@ -3,13 +3,10 @@
 ])
 
 @section('header')
-    <nav>
-        <ul class="app-cmp-links">
-            <li>
-                <a href="{{ session()->get('bookmarks.categories.view') ?? route('categories.index') }}">&lt; Back</a>
-            </li>
-        </ul>
-    </nav>
+    <div class="app-cmp-links-bar">
+        <a href="{{ session()->get('bookmarks.categories.view') ?? route('categories.index') }}"
+            class="app-cl-button app-cl-primary">&lt; Back</a>
+    </div>
 @endsection
 
 @section('content')
