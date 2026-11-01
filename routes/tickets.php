@@ -1,11 +1,10 @@
 <?php
 
+use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
 
-/*
- * เจ้าของ: คนที่ 2
- * GET /activities/{activity}/ticket → activities.ticket (middleware auth)
- * ชื่อ route ให้ตรงกับตารางใน docs/team/README.md (คนอื่นลิงก์มาด้วยชื่อนี้)
- */
-
-// ขั้นที่ 2: เพิ่ม route ที่นี่
+Route::controller(TicketController::class)
+    ->middleware('auth')
+    ->group(static function (): void {
+        Route::get('/activities/{activity}/ticket', 'download')->name('activities.ticket');
+    });
