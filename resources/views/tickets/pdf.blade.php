@@ -44,21 +44,36 @@
             width: 30%;
             font-weight: bold;
         }
+
+        .tone {
+            position: relative;
+            top: -0.38em;
+        }
     </style>
 </head>
 
 <body>
+    @php
+        // dompdf วางวรรณยุกต์ทับสระบน (ที่ เมื่อ วิ่ง) → ครอบวรรณยุกต์ด้วย span แล้วยกขึ้นด้วย .tone
+        // e() ก่อนเสมอ เพราะผลลัพธ์แสดงด้วย {!! !!} ซึ่งไม่ escape ให้
+        $thai = static fn(string $text): string => \preg_replace(
+            '/([\x{0E31}\x{0E34}-\x{0E37}])([\x{0E48}-\x{0E4C}])/u',
+            '$1<span class="tone">$2</span>',
+            e($text),
+        );
+    @endphp
+
     <table class="ticket">
         <tr>
             <th colspan="2">บัตรเข้าร่วมกิจกรรม</th>
         </tr>
         <tr>
-            <td class="label">เลขที่บัตร</td>
+            <td class="label">{!! $thai('เลขที่บัตร') !!}</td>
             <td>{{ $activity->code }}-{{ str_pad($user->id, 4, '0', STR_PAD_LEFT) }}</td>
         </tr>
         <tr>
-            <td class="label">ชื่อผู้เข้าร่วม</td>
-            <td>{{ $user->name }}</td>
+            <td class="label">{!! $thai('ชื่อผู้เข้าร่วม') !!}</td>
+            <td>{!! $thai($user->name) !!}</td>
         </tr>
         <tr>
             <td class="label">อีเมล</td>
@@ -66,26 +81,26 @@
         </tr>
         <tr>
             <td class="label">กิจกรรม</td>
-            <td>[{{ $activity->code }}] {{ $activity->name }}</td>
+            <td>[{{ $activity->code }}] {!! $thai($activity->name) !!}</td>
         </tr>
         <tr>
             <td class="label">หมวดหมู่</td>
-            <td>{{ $activity->category->name }}</td>
+            <td>{!! $thai($activity->category->name) !!}</td>
         </tr>
         <tr>
             <td class="label">ผู้จัด</td>
-            <td>{{ $activity->organizer->name }}</td>
+            <td>{!! $thai($activity->organizer->name) !!}</td>
         </tr>
         <tr>
-            <td class="label">วันที่จัด</td>
+            <td class="label">{!! $thai('วันที่จัด') !!}</td>
             <td>{{ $activity->date->format('d/m/Y') }}</td>
         </tr>
         <tr>
-            <td class="label">สถานที่</td>
-            <td>{{ $activity->location }}</td>
+            <td class="label">{!! $thai('สถานที่') !!}</td>
+            <td>{!! $thai($activity->location) !!}</td>
         </tr>
         <tr>
-            <td class="label">สมัครเมื่อ</td>
+            <td class="label">{!! $thai('สมัครเมื่อ') !!}</td>
             <td>{{ $registeredAt->format('d/m/Y H:i') }}</td>
         </tr>
     </table>
