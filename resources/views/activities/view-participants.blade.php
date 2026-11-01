@@ -7,7 +7,7 @@
             action="{{ route('activities.view-participants', ['activity' => $activity->code]) }}">
             <fieldset>
                 <legend>ค้นหาผู้สมัคร</legend>
-                <label>ชื่อหรืออีเมล <input name="term" value="{{ $term }}" /></label>
+                <label>ชื่อหรืออีเมล <input type="text" name="term" value="{{ $term }}" /></label>
                 <button class="app-cl-button">ค้นหา</button>
             </fieldset>
         </form>

@@ -6,7 +6,7 @@
         <form action="{{ route('activities.list') }}" method="get" class="app-cmp-search-form">
             <fieldset>
                 <legend>ค้นหากิจกรรม</legend>
-                <label>คำค้น <input name="term" value="{{ $criteria['term'] }}" /></label>
+                <label>คำค้น <input type="text" name="term" value="{{ $criteria['term'] }}" /></label>
                 <label>หมวดหมู่
                     <select name="category">
                         <option value="">ทุกหมวดหมู่</option>
@@ -18,7 +18,7 @@
                         @endforeach
                     </select>
                 </label>
-                <label>
+                <label class="app-cl-check">
                     <input type="checkbox" name="upcoming" value="1" @checked($criteria['upcoming']) />
                     เฉพาะกิจกรรมวันนี้และอนาคต
                 </label>
@@ -46,7 +46,15 @@
                     <td>{{ $activity->date->format('d/m/Y') }}</td>
                     <td>{{ $activity->location }}</td>
                     <td>{{ $activity->participants_count }} / {{ $activity->capacity }}</td>
-                    <td>{{ !$activity->isOpen() ? 'จบแล้ว' : ($activity->isFull() ? 'เต็มแล้ว' : 'เปิดรับ') }}</td>
+                    <td>
+                        @if (!$activity->isOpen())
+                            <span class="app-cmp-status app-cl-closed">จบแล้ว</span>
+                        @elseif ($activity->isFull())
+                            <span class="app-cmp-status app-cl-full">เต็มแล้ว</span>
+                        @else
+                            <span class="app-cmp-status app-cl-open">เปิดรับ</span>
+                        @endif
+                    </td>
                 </tr>
             @empty
                 <tr><td colspan="8">ไม่พบกิจกรรม</td></tr>

@@ -64,7 +64,7 @@ class CategoryController extends SearchableController
             session()->forget('bookmarks.categories.create');
             return redirect()
                 ->route('categories.view', ['category' => $category->code])
-                ->with('status', "Category {$category->code} was created.");
+                ->with('status', "หมวดหมู่ {$category->code} ถูกสร้างแล้ว");
         } catch (QueryException $excp) {
             return redirect()->back()->withInput()->withErrors([
                 'alert' => $excp->errorInfo[2],
@@ -102,7 +102,7 @@ class CategoryController extends SearchableController
 
             return redirect()
                 ->route('categories.view', ['category' => $category->code])
-                ->with('status', "Category {$category->code} was updated.");
+                ->with('status', "หมวดหมู่ {$category->code} ถูกแก้ไขแล้ว");
         } catch (QueryException $excp) {
             return redirect()->back()->withInput()->withErrors([
                 'alert' => $excp->errorInfo[2],
@@ -119,7 +119,7 @@ class CategoryController extends SearchableController
             $category->delete();
 
             return redirect(session()->get('bookmarks.categories.delete') ?? route('categories.index'))
-                ->with('status', "Category {$category->code} was deleted.");
+                ->with('status', "หมวดหมู่ {$category->code} ถูกลบแล้ว");
         } catch (QueryException $excp) {
             return redirect()->back()->withErrors([
                 'alert' => $excp->errorInfo[2],
@@ -127,17 +127,25 @@ class CategoryController extends SearchableController
         }
     }
 
-    function viewActivities(string $categoryCode): View
+    function viewActivities(string $categoryCode, ServerRequestInterface $request): View
     {
         $category = $this->find($categoryCode);
         Gate::authorize('view', $category);
 
-        // ระหว่างที่ ActivityController ยังไม่เสร็จ: ยังไม่มีค้นหา (ดู docs/team/MEMBER_2.md)
-        $activities = $category->activities()->orderBy('code')->paginate(self::MAX_ITEMS);
+        $activityController = \resolve(ActivityController::class);
+        $criteria = $activityController->prepareCriteria($request->getQueryParams());
+
+        // ทุกกิจกรรมในหน้านี้อยู่หมวดเดียวกัน จึงไม่ค้นด้วยชื่อหมวด (แบบ view-products ในคาบ)
+        $filterOptions = $activityController->getFilterOptions();
+        unset($filterOptions['term']['category']);
+
+        $query = $category->activities()->orderBy('code');
+        $activityController->filter($query, $criteria, $filterOptions);
 
         return view('categories.view-activities', [
+            'criteria' => $criteria,
             'category' => $category,
-            'activities' => $activities,
+            'activities' => $query->paginate($activityController::MAX_ITEMS),
         ]);
     }
 }

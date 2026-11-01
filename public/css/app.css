@@ -429,6 +429,12 @@ textarea:focus-visible {
 }
 
 /* ---------- 8. ฟอร์มค้นหา: <search><form class="app-cmp-search-form"><fieldset><legend> ---------- */
+/* เว้นระยะเมื่อฟอร์มค้นหาต่อจากแถบลิงก์ (หน้ารายการกิจกรรม) */
+.app-cmp-links-bar + search {
+    display: block;
+    margin-top: 1rem;
+}
+
 .app-cmp-search-form fieldset {
     margin: 0;
     padding: 1rem;
@@ -457,6 +463,15 @@ textarea:focus-visible {
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--app-muted);
+}
+
+/* ช่องติ๊กอยู่หน้าข้อความ ไม่ซ้อนบนล่างแบบช่องกรอก */
+.app-cmp-search-form label.app-cl-check {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
 }
 
 .app-cmp-search-form .app-cmp-form-actions {

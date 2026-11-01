@@ -1,11 +1,27 @@
 @extends('categories.main', [
-    'title' => "{$category->name}: Activities",
+    'title' => "{$category->name}: กิจกรรม",
 ])
 
 @section('header')
+    <search>
+        <form action="{{ route('categories.view-activities', ['category' => $category->code]) }}" method="get"
+            class="app-cmp-search-form">
+            <fieldset>
+                <legend>ค้นหากิจกรรมในหมวด</legend>
+                <label>
+                    <b>คำค้น</b>
+                    <input type="text" name="term" value="{{ $criteria['term'] }}" />
+                </label>
+                <br />
+                <button type="submit">ค้นหา</button>
+                <a href="{{ route('categories.view-activities', ['category' => $category->code]) }}">ล้างคำค้น</a>
+            </fieldset>
+        </form>
+    </search>
+
     <div class="app-cmp-links-bar">
         <a href="{{ session()->get('bookmarks.categories.view-activities') ?? route('categories.view', ['category' => $category->code]) }}"
-            class="app-cl-button app-cl-primary">&lt; Back</a>
+            class="app-cl-button app-cl-primary">&lt; กลับ</a>
 
         {{ $activities->withQueryString()->links() }}
     </div>
@@ -13,28 +29,26 @@
 
 @section('content')
     <table class="app-cmp-data-list">
-        <caption>List of Activities</caption>
+        <caption>รายการกิจกรรม</caption>
         <thead>
             <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Date</th>
-                <th>Location</th>
-                <th class="app-cl-number">Capacity</th>
+                <th>รหัส</th>
+                <th>ชื่อกิจกรรม</th>
+                <th>วันที่</th>
+                <th>สถานที่</th>
+                <th class="app-cl-number">จำนวนรับ</th>
             </tr>
         </thead>
         <tbody>
+            @php
+                session()->put('bookmarks.activities.view', url()->full());
+            @endphp
             @foreach ($activities as $activity)
                 <tr>
                     <th class="app-cl-code">
-                        {{-- ลิงก์จะโผล่เองเมื่อคนที่ 1 เพิ่ม route activities.view --}}
-                        @if (Route::has('activities.view'))
-                            <a href="{{ route('activities.view', ['activity' => $activity->code]) }}">
-                                {{ $activity->code }}
-                            </a>
-                        @else
+                        <a href="{{ route('activities.view', ['activity' => $activity->code]) }}">
                             {{ $activity->code }}
-                        @endif
+                        </a>
                     </th>
                     <td>{{ $activity->name }}</td>
                     <td class="app-cl-nowrap">{{ $activity->date->format('d/m/Y') }}</td>
