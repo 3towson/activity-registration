@@ -429,6 +429,12 @@ textarea:focus-visible {
 }
 
 /* ---------- 8. ฟอร์มค้นหา: <search><form class="app-cmp-search-form"><fieldset><legend> ---------- */
+/* เว้นระยะเมื่อฟอร์มค้นหาต่อจากแถบลิงก์ (หน้ารายการกิจกรรม) */
+.app-cmp-links-bar + search {
+    display: block;
+    margin-top: 1rem;
+}
+
 .app-cmp-search-form fieldset {
     margin: 0;
     padding: 1rem;
