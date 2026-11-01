@@ -604,12 +604,92 @@ textarea {
     white-space: nowrap;
 }
 
-/*
- * ขั้นที่ 2 (คนที่ 2) เพิ่มต่อ: ป้ายสถานะ (เปิดรับ/เต็ม/จบแล้ว), หน้ารายละเอียดกิจกรรม + กล่องสมัคร,
- * การ์ดกิจกรรมหน้าแรก, แท็บ, ปุ่มหมวดหมู่
- */
+/* ---------- 14. ป้ายสถานะ: <span class="app-cmp-status app-cl-open"> ---------- */
+.app-cmp-status {
+    display: inline-block;
+    padding: 0 0.6rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
 
-/* ---------- 14. หน้าจอเล็ก ---------- */
+/* เปิดรับ = เขียว */
+.app-cmp-status.app-cl-open {
+    background: var(--app-success-soft);
+    color: var(--app-success);
+}
+
+/* เต็มแล้ว = แดง */
+.app-cmp-status.app-cl-full {
+    background: var(--app-warning-soft);
+    color: var(--app-warning);
+}
+
+/* จบแล้ว = เทา */
+.app-cmp-status.app-cl-closed {
+    background: #eef1ec;
+    color: var(--app-muted);
+}
+
+/* ---------- 15. กล่องสมัคร: <section class="app-cmp-signup-box"> ---------- */
+.app-cmp-signup-box {
+    max-width: 52rem;
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--app-primary-soft);
+    border: 1px solid var(--app-primary);
+    border-radius: var(--app-radius);
+}
+
+.app-cmp-signup-box h2 {
+    font-size: 1.1rem;
+}
+
+.app-cmp-signup-box p {
+    margin: 0;
+}
+
+.app-cmp-signup-box .app-cmp-form-actions {
+    margin-top: 0;
+}
+
+/* ---------- 16. การ์ดกิจกรรมหน้าแรก: <div class="app-cmp-activity-cards"><article class="app-cmp-activity-card"> ---------- */
+.app-cmp-activity-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    gap: 1rem;
+}
+
+.app-cmp-activity-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    background: var(--app-surface);
+    border: 1px solid var(--app-line);
+    border-radius: var(--app-radius);
+    box-shadow: var(--app-shadow);
+}
+
+.app-cmp-activity-card h3 {
+    font-size: 1.05rem;
+}
+
+.app-cmp-activity-card p {
+    margin: 0;
+}
+
+/* ดันปุ่มลงล่างสุด การ์ดในแถวเดียวกันปุ่มจึงตรงกันแม้ชื่อยาวไม่เท่ากัน */
+.app-cmp-activity-card > footer {
+    margin-top: auto;
+    padding-top: 0.5rem;
+}
+
+/* ---------- 17. หน้าจอเล็ก ---------- */
 @media (max-width: 760px) {
     #app-main-header > nav {
         gap: 0.6rem;
