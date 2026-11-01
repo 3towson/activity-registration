@@ -3,6 +3,22 @@
 ])
 
 @section('header')
+    <search>
+        <form action="{{ route('categories.view-activities', ['category' => $category->code]) }}" method="get"
+            class="app-cmp-search-form">
+            <fieldset>
+                <legend>Search</legend>
+                <label>
+                    <b>Term</b>
+                    <input type="text" name="term" value="{{ $criteria['term'] }}" />
+                </label>
+                <br />
+                <button type="submit">Filter</button>
+                <a href="{{ route('categories.view-activities', ['category' => $category->code]) }}">Clear</a>
+            </fieldset>
+        </form>
+    </search>
+
     <div class="app-cmp-links-bar">
         <a href="{{ session()->get('bookmarks.categories.view-activities') ?? route('categories.view', ['category' => $category->code]) }}"
             class="app-cl-button app-cl-primary">&lt; Back</a>
