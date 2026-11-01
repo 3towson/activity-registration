@@ -64,7 +64,7 @@ class CategoryController extends SearchableController
             session()->forget('bookmarks.categories.create');
             return redirect()
                 ->route('categories.view', ['category' => $category->code])
-                ->with('status', "Category {$category->code} was created.");
+                ->with('status', "หมวดหมู่ {$category->code} ถูกสร้างแล้ว");
         } catch (QueryException $excp) {
             return redirect()->back()->withInput()->withErrors([
                 'alert' => $excp->errorInfo[2],
@@ -102,7 +102,7 @@ class CategoryController extends SearchableController
 
             return redirect()
                 ->route('categories.view', ['category' => $category->code])
-                ->with('status', "Category {$category->code} was updated.");
+                ->with('status', "หมวดหมู่ {$category->code} ถูกแก้ไขแล้ว");
         } catch (QueryException $excp) {
             return redirect()->back()->withInput()->withErrors([
                 'alert' => $excp->errorInfo[2],
@@ -119,7 +119,7 @@ class CategoryController extends SearchableController
             $category->delete();
 
             return redirect(session()->get('bookmarks.categories.delete') ?? route('categories.index'))
-                ->with('status', "Category {$category->code} was deleted.");
+                ->with('status', "หมวดหมู่ {$category->code} ถูกลบแล้ว");
         } catch (QueryException $excp) {
             return redirect()->back()->withErrors([
                 'alert' => $excp->errorInfo[2],

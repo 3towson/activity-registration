@@ -1,3 +1,3 @@
 @extends('layouts.main',[
-    'title' => "Category: {$title}",
+    'title' => "หมวดหมู่: {$title}",
 ])

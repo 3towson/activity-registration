@@ -1,19 +1,19 @@
 @extends('categories.main', [
-    'title' => 'List',
+    'title' => 'รายการ',
 ])
 
 @section('header')
     <search>
         <form action="{{ route('categories.list') }}" method="get" class="app-cmp-search-form">
             <fieldset>
-                <legend>Search</legend>
+                <legend>ค้นหาหมวดหมู่</legend>
                 <label>
-                    <b>Term</b>
+                    <b>คำค้น</b>
                     <input type="text" name="term" value="{{ $criteria['term'] }}" />
                 </label>
                 <br />
-                <button type="submit">Filter</button>
-                <a href="{{ route('categories.list') }}">Clear</a>
+                <button type="submit">ค้นหา</button>
+                <a href="{{ route('categories.list') }}">ล้างคำค้น</a>
             </fieldset>
         </form>
     </search>
@@ -24,7 +24,7 @@
                 session()->put('bookmarks.categories.create-form', url()->full());
                 session()->put('bookmarks.categories.create', url()->full());
             @endphp
-            <a href="{{ route('categories.create-form') }}" class="app-cl-button app-cl-filled app-cl-primary">New Category</a>
+            <a href="{{ route('categories.create-form') }}" class="app-cl-button app-cl-filled app-cl-primary">สร้างหมวดหมู่</a>
         @endcan
 
         {{ $categories->withQueryString()->links() }}
@@ -34,12 +34,12 @@
 
 @section('content')
     <table class="app-cmp-data-list">
-        <caption>List of Categories</caption>
+        <caption>รายการหมวดหมู่</caption>
         <thead>
             <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th class="app-cl-number">No. of Activities</th>
+                <th>รหัส</th>
+                <th>ชื่อหมวดหมู่</th>
+                <th class="app-cl-number">จำนวนกิจกรรม</th>
             </tr>
         </thead>
         <tbody>

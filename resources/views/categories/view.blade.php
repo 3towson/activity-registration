@@ -16,32 +16,32 @@
 
     <div class="app-cmp-links-bar">
         <a href="{{ session()->get('bookmarks.categories.view') ?? route('categories.index') }}"
-            class="app-cl-button app-cl-primary">&lt; Back</a>
+            class="app-cl-button app-cl-primary">&lt; กลับ</a>
 
         <a href="{{ route('categories.view-activities', ['category' => $category->code]) }}"
-            class="app-cl-button app-cl-primary">View Activities</a>
+            class="app-cl-button app-cl-primary">ดูกิจกรรมในหมวด</a>
 
         @can('update', $category)
             <a href="{{ route('categories.update-form', ['category' => $category->code]) }}"
-                class="app-cl-button app-cl-filled app-cl-primary">Update</a>
+                class="app-cl-button app-cl-filled app-cl-primary">แก้ไข</a>
         @endcan
 
         @can('delete', $category)
             <button type="submit" form="app-form-delete"
-                class="app-cl-button app-cl-filled app-cl-warning">Delete</button>
+                class="app-cl-button app-cl-filled app-cl-warning">ลบ</button>
         @endcan
     </div>
 @endsection
 
 @section('content')
     <dl class="app-cmp-data-detail">
-        <dt>Code</dt>
+        <dt>รหัส</dt>
         <dd><span class="app-cl-code">{{ $category->code }}</span></dd>
 
-        <dt>Name</dt>
+        <dt>ชื่อหมวดหมู่</dt>
         <dd>{{ $category->name }}</dd>
 
-        <dt>Description</dt>
+        <dt>รายละเอียด</dt>
         <dd>{{ $category->description }}</dd>
     </dl>
 @endsection
