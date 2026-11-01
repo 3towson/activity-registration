@@ -18,7 +18,7 @@
                         @endforeach
                     </select>
                 </label>
-                <label>
+                <label class="app-cl-check">
                     <input type="checkbox" name="upcoming" value="1" @checked($criteria['upcoming']) />
                     เฉพาะกิจกรรมวันนี้และอนาคต
                 </label>
