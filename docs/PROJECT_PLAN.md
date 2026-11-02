@@ -28,7 +28,7 @@
 ทำเว็บ **ระบบสมัครเข้าร่วมกิจกรรม** ด้วย Laravel + Blade
 ใช้เว็บที่ทำพร้อมอาจารย์ในคาบ (`my-db`: Product – Shop – Category – User) เป็น **reference** ของวิธีเขียน แต่สร้างโปรเจกต์ใหม่ (`laravel new`) และเขียนเองทั้งหมด
 
-- **คนทั่วไป (ไม่ login):** ดูหน้าแรก รายการกิจกรรม และรายละเอียดกิจกรรมได้ และสมัครสมาชิกได้
+- **คนทั่วไป (ไม่ login):** ดูรายการกิจกรรม (หน้าแรกของเว็บ) และรายละเอียดกิจกรรมได้ และสมัครสมาชิกได้
 - **สมาชิก (USER):** สมัคร/ยกเลิกกิจกรรม ดูกิจกรรมที่ตัวเองสมัคร ดาวน์โหลดบัตรเข้าร่วม (PDF)
 - **ผู้ดูแล (ADMIN):** จัดการหมวดหมู่ ผู้จัด กิจกรรม และดูรายชื่อผู้สมัคร
 
@@ -173,7 +173,7 @@ function isAdministrator(): bool { return $this->role === 'ADMIN'; }
 
 | ทำอะไร | ไม่ login | USER | ADMIN |
 |---|:---:|:---:|:---:|
-| ดูหน้าแรก / รายการกิจกรรม / รายละเอียดกิจกรรม | ✅ | ✅ | ✅ |
+| ดูรายการกิจกรรม / รายละเอียดกิจกรรม | ✅ | ✅ | ✅ |
 | สมัครสมาชิก | ✅ | – | – |
 | สมัคร / ยกเลิกกิจกรรม | ❌ (ไป login) | ✅ | ❌ |
 | ดูกิจกรรมที่ตัวเองสมัคร | ❌ | ✅ | ❌ |
@@ -222,7 +222,7 @@ route แยกไฟล์ตามเจ้าของงาน แล้ว 
 ### Public (ไม่ต้อง login)
 | Method | URL | Name | Controller@method |
 |---|---|---|---|
-| GET | `/` | `home` | `HomeController@index` — กิจกรรมที่ใกล้จะจัด |
+| GET | `/` | `home` | redirect ไปหน้ารายการกิจกรรม |
 | GET | `/activities/list` | `activities.list` | `ActivityController@list` |
 | ANY | `/activities` | `activities.index` | redirect → `activities.list` |
 | GET | `/activities/{activity}` | `activities.view` | `ActivityController@view` |
@@ -432,7 +432,7 @@ body { font-family: 'Sarabun', sans-serif; }
 |---|---|---|
 | **คนที่ 1:** _ชื่อ_ | Activity CRUD · สมัคร/ยกเลิก + business rules · รายชื่อผู้สมัคร (admin) | `ActivityController`, `ActivityPolicy`, `views/activities/*`, `routes/activities.php` |
 | **คนที่ 2:** _ชื่อ_ | Category CRUD · CSS ทั้งเว็บ · **dompdf บัตรเข้าร่วม** | `CategoryController`, `CategoryPolicy`, `TicketController`, `views/categories/*`, `views/tickets/*`, `public/css/app.css`, `resources/fonts/*`, `routes/categories.php`, `routes/tickets.php` |
-| **คนที่ 3:** _ชื่อ_ | Organizer CRUD · สมัครสมาชิก · หน้าแรก · กิจกรรมของฉัน | `OrganizerController`, `OrganizerPolicy`, `RegisterController`, `HomeController`, `MyActivityController`, `views/organizers/*`, `views/registers/*`, `views/home.blade.php`, `views/my-activities/*`, `routes/organizers.php`, `routes/auth.php`, `routes/my-activities.php`, `lang/th/*` |
+| **คนที่ 3:** _ชื่อ_ | Organizer CRUD · สมัครสมาชิก · กิจกรรมของฉัน | `OrganizerController`, `OrganizerPolicy`, `RegisterController`, `MyActivityController`, `views/organizers/*`, `views/registers/*`, `views/my-activities/*`, `routes/organizers.php`, `routes/auth.php`, `routes/my-activities.php`, `lang/th/*` |
 
 - ทุกคนมี CRUD 1 model → อธิบาย R2 ได้ทุกคน
 - ข้อมูลที่ต้องใช้มีอยู่แล้วจาก seeder → ไม่ต้องรองานกัน (เช่น ทำบัตร PDF ได้เลยโดยไม่ต้องรอระบบสมัคร)

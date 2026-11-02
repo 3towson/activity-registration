@@ -23,10 +23,6 @@
                 - ลิงก์ไป route xxx.index แบบในคาบ (index redirect ไป xxx.list)
             --}}
             <ul class="app-cmp-links">
-                <li @class(['app-cl-active' => Route::is('home')])>
-                    <a href="{{ route('home') }}">หน้าแรก</a>
-                </li>
-
                 @if (Route::has('activities.index'))
                     <li @class(['app-cl-active' => Route::is('activities.*')])>
                         <a href="{{ route('activities.index') }}">กิจกรรม</a>

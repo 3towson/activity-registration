@@ -144,12 +144,12 @@ Category 1 ── N Activity N ── 1 Organizer
 ตรวจในเครื่อง **ของทุกคน** แล้วติ๊กในกลุ่ม:
 
 - [ ] `composer install` → `php artisan key:generate` → `php artisan migrate:fresh --seed` ผ่านไม่มี error
-- [ ] เปิด `http://127.0.0.1:8000` เห็นหน้าแรก การ์ดกิจกรรมที่ใกล้จะจัด และตัวเลขสรุป (กิจกรรมทั้งหมด 12, หมวดหมู่ 4, ผู้จัด 4)
-- [ ] การ์ดแสดงชื่อหมวด ชื่อผู้จัด และจำนวนผู้สมัคร (relationships ใช้ได้) · ภาษาไทยไม่เป็น `???`
+- [ ] เปิด `http://127.0.0.1:8000` ถูกพาไปหน้ารายการกิจกรรม และเห็นกิจกรรม AC001–AC005 พร้อมลิงก์เปลี่ยนหน้า
+- [ ] ตารางแสดงชื่อหมวด ชื่อผู้จัด และจำนวนผู้สมัคร (relationships ใช้ได้) · ภาษาไทยไม่เป็น `???`
 - [ ] login `admin@activity.test` / `1234` ได้ → มุมขวาบนขึ้นชื่อ + ป้าย "ผู้ดูแล" · ไม่มีเมนู "กิจกรรมของฉัน"
 - [ ] logout แล้ว login `user@activity.test` / `1234` ได้ → ป้าย "สมาชิก" · เมนู "กิจกรรมของฉัน" แสดงกิจกรรมที่สมัครไว้ 3 กิจกรรม
 - [ ] ใส่รหัสผิด → ข้อความแดง "อีเมลหรือรหัสผ่านไม่ถูกต้อง" และช่องอีเมลยังมีค่าเดิม
-- [ ] login แล้วเปิด `/auth/login` → ถูกพากลับหน้าแรก
+- [ ] login แล้วเปิด `/auth/login` → ถูกพาไปหน้ารายการกิจกรรม
 - [ ] phpMyAdmin → `activity_db` มีตาราง `users, categories, organizers, activities, activity_user`
 
 ---
@@ -167,7 +167,7 @@ git checkout -b member-3/organizers-accounts # คนที่ 3
 |---|---|---|
 | คนที่ 1 | `routes/activities.php`, `ActivityController`, `ActivityPolicy` | หน้า public รายการ + รายละเอียดกิจกรรม (เมนู "กิจกรรม" จะโผล่เองเมื่อมี route `activities.index`) |
 | คนที่ 2 | `routes/categories.php`, `CategoryController`, `CategoryPolicy` | Category list/view → create/update/delete (เมนู "หมวดหมู่" โผล่เองเมื่อมี route `categories.index`) · แล้วทดสอบ dompdf ฟอนต์ไทยให้ผ่านก่อน |
-| คนที่ 3 | `routes/organizers.php`, `routes/auth.php`, `OrganizerController` | หน้าสมัครสมาชิก (ลิงก์ในหน้า login/เมนูจะโผล่เอง) → Organizer CRUD → หน้าแรกจริง |
+| คนที่ 3 | `routes/organizers.php`, `routes/auth.php`, `OrganizerController` | หน้าสมัครสมาชิก (ลิงก์ในหน้า login/เมนูจะโผล่เอง) → Organizer CRUD → กิจกรรมของฉัน |
 
 รายละเอียดทั้งหมด (routes, validation, checklist, สิ่งที่ต้องอธิบาย): [`docs/team/MEMBER_1.md`](docs/team/MEMBER_1.md) · [`MEMBER_2.md`](docs/team/MEMBER_2.md) · [`MEMBER_3.md`](docs/team/MEMBER_3.md)
 
@@ -188,7 +188,7 @@ git checkout -b member-3/organizers-accounts # คนที่ 3
 
 ```
 app/
-  Http/Controllers/   SearchableController, LoginController, HomeController (+ ของแต่ละคนในขั้นที่ 2)
+  Http/Controllers/   SearchableController, LoginController (+ ของแต่ละคนในขั้นที่ 2)
   Models/             User, Category, Organizer, Activity
   Providers/          AppServiceProvider (pagination)
 database/
@@ -197,7 +197,6 @@ database/
 resources/views/
   layouts/main.blade.php   layout หลัก (เมนู + กล่องแจ้งเตือน)
   logins/form.blade.php
-  home.blade.php           หน้าแรก (การ์ดกิจกรรม + ตัวเลขสรุป)
 routes/
   web.php              รวมทุกไฟล์ด้านล่าง
   auth.php             คนที่ 3

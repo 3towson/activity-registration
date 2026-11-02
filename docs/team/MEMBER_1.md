@@ -85,7 +85,7 @@ Branch: `member-1/activities`
 - **รับจากคนที่ 2:** `SearchableController`, `Category` model, CSS class
 - **รับจากคนที่ 3:** `User::activities()`, `isAdministrator()`, `isMember()`, `Organizer` model, layout
 - **ส่งให้คนที่ 2:** `participants()` (ใช้ทำบัตร), ปุ่มลิงก์ `activities.ticket` ในหน้ารายละเอียด, `ActivityController::getFilterOptions()` / `filter()` ที่หน้า `categories.view-activities` ยืมไปใช้ผ่าน `\resolve()`
-- **ส่งให้คนที่ 3:** `ActivityController::filter()` สำหรับหน้า `organizers.view-activities`, helper `isOpen()` / `isFull()` สำหรับหน้าแรก
+- **ส่งให้คนที่ 3:** `ActivityController::filter()` สำหรับหน้า `organizers.view-activities`
 
 ## Checklist ว่างานเสร็จ
 

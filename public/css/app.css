@@ -671,40 +671,7 @@ textarea {
     margin-top: 0;
 }
 
-/* ---------- 16. การ์ดกิจกรรมหน้าแรก: <div class="app-cmp-activity-cards"><article class="app-cmp-activity-card"> ---------- */
-.app-cmp-activity-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-    gap: 1rem;
-}
-
-.app-cmp-activity-card {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    padding: 1.25rem;
-    background: var(--app-surface);
-    border: 1px solid var(--app-line);
-    border-radius: var(--app-radius);
-    box-shadow: var(--app-shadow);
-}
-
-.app-cmp-activity-card h3 {
-    font-size: 1.05rem;
-}
-
-.app-cmp-activity-card p {
-    margin: 0;
-}
-
-/* ดันปุ่มลงล่างสุด การ์ดในแถวเดียวกันปุ่มจึงตรงกันแม้ชื่อยาวไม่เท่ากัน */
-.app-cmp-activity-card > footer {
-    margin-top: auto;
-    padding-top: 0.5rem;
-}
-
-/* ---------- 17. หน้าจอเล็ก ---------- */
+/* ---------- 16. หน้าจอเล็ก ---------- */
 @media (max-width: 760px) {
     #app-main-header > nav {
         gap: 0.6rem;

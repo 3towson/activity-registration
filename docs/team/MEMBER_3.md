@@ -3,7 +3,7 @@
 ชื่อสมาชิก: __________
 Branch: `member-3/organizers-accounts`
 
-รับผิดชอบการตั้งโปรเจกต์ ระบบ login / สมัครสมาชิก / role, layout หลัก, ผู้จัดกิจกรรม และหน้าฝั่งผู้ใช้ (หน้าแรก, กิจกรรมของฉัน) อ่าน [ข้อตกลงร่วม](README.md) ก่อนเริ่ม
+รับผิดชอบการตั้งโปรเจกต์ ระบบ login / สมัครสมาชิก / role, layout หลัก, ผู้จัดกิจกรรม และหน้ากิจกรรมของฉัน อ่าน [ข้อตกลงร่วม](README.md) ก่อนเริ่ม
 
 | เทียบกับเว็บในคาบ (`my-db`) | งานนี้ |
 |---|---|
@@ -12,7 +12,7 @@ Branch: `member-3/organizers-accounts`
 | สร้าง User: `new User($data)` แล้วตั้ง `email`, `role` เอง (Lab 13) | ใช้วิธีเดียวกันในหน้าสมัครสมาชิก · role = `USER` เสมอ |
 | Shop + `ShopController` (CRUD ธรรมดา มี code, name) | Organizer + `OrganizerController` |
 | `layouts/main.blade.php` (เมนู, ชื่อ user, Logout, `status`/`alert`) | เหมือนเดิม + `@guest` แสดงปุ่มเข้าสู่ระบบ / สมัครสมาชิก |
-| ทุกหน้าต้อง login | **มีหน้า public**: หน้าแรก, สมัครสมาชิก (+ หน้ากิจกรรมของคนที่ 1) |
+| ทุกหน้าต้อง login | **มีหน้า public**: สมัครสมาชิก (+ หน้ากิจกรรมของคนที่ 1 ซึ่งเป็นหน้าแรกของเว็บ) |
 
 ---
 
@@ -38,7 +38,7 @@ Branch: `member-3/organizers-accounts`
    - อีเมลซ้ำ → `QueryException` → กล่องแดง `Duplicate entry ...` · คืนค่าฟอร์มด้วย `withInput()` แต่ **ไม่คืนรหัสผ่าน**
    - `Auth::attempt()` (แบบ `LoginController`) + `session()->regenerate()` แล้วพาไปหน้ารายการกิจกรรม
    - หน้า login / สมัครสมาชิกใช้ middleware `guest` (login แล้วเข้าไม่ได้)
-3. **หน้าแรก (public)** — กิจกรรมที่ใกล้จะจัด 6 รายการ (การ์ด), ตัวเลขสรุป, ปุ่มหมวดหมู่ที่ลิงก์ไป `activities.list?category=...`
+3. **หน้าแรก (public)** — `/` redirect ไปหน้ารายการกิจกรรม (`activities.list`)
 4. **กิจกรรมของฉัน (USER)** — `$user->activities()` แยกแท็บ "กำลังจะมาถึง" / "ที่ผ่านมาแล้ว" · มีลิงก์บัตร PDF · ADMIN เข้าแล้วได้ 403
 5. (ไม่บังคับ) **ข้อความ validation ของ login เป็นภาษาไทย** — `lang/th/validation.php` (`required`, `email`) — CRUD ไม่ได้ใช้ `Validator` แล้ว
 6. ดูแลการรวม `routes/web.php` และ layout เมื่อเพื่อนขอเพิ่มเมนู
@@ -55,9 +55,9 @@ Branch: `member-3/organizers-accounts`
 | `app/Models/User.php`, `app/Models/Organizer.php` | role helper + relationships |
 | `app/Http/Controllers/LoginController.php`, `RegisterController.php` | login / logout / สมัครสมาชิก |
 | `app/Http/Controllers/OrganizerController.php`, `app/Policies/OrganizerPolicy.php` | Organizer CRUD |
-| `app/Http/Controllers/HomeController.php`, `MyActivityController.php` | หน้าแรก, กิจกรรมของฉัน |
+| `app/Http/Controllers/MyActivityController.php` | กิจกรรมของฉัน |
 | `resources/views/layouts/main.blade.php` | layout หลัก |
-| `resources/views/logins/*`, `registers/*`, `organizers/*`, `home.blade.php`, `my-activities/*` | หน้าของตัวเอง |
+| `resources/views/logins/*`, `registers/*`, `organizers/*`, `my-activities/*` | หน้าของตัวเอง |
 | `routes/web.php`, `routes/auth.php`, `routes/organizers.php`, `routes/my-activities.php` | routes |
 | `lang/th/*` (ไม่บังคับ) | ข้อความภาษาไทยของ login / pagination |
 | `README.md` (ราก repo) | วิธีติดตั้ง + บัญชีทดสอบ |
@@ -66,7 +66,7 @@ Branch: `member-3/organizers-accounts`
 
 | Method / URL | Name | ทำอะไร | สิทธิ์ |
 |---|---|---|---|
-| GET `/` | `home` | หน้าแรก | Public |
+| GET `/` | `home` | redirect ไปหน้ารายการกิจกรรม | Public |
 | GET `/auth/login` | `login` | ฟอร์ม login (ต้องชื่อ `login` เพราะ middleware `auth` redirect มาที่ชื่อนี้) | Guest |
 | POST `/auth/login` | `authentication` | ตรวจ login | Guest |
 | GET `/auth/register` | `register-form` | ฟอร์มสมัครสมาชิก | Guest (public) |
@@ -88,7 +88,7 @@ Branch: `member-3/organizers-accounts`
 - **ส่งให้ทุกคน (ต้นขั้นที่ 1):** repo + วิธีติดตั้ง, `User::isAdministrator()` / `isMember()`, บัญชีทดสอบ, layout (`@extends('layouts.main', ['title' => ...])`, `@section('header')`, `@section('content')`), วิธีส่งข้อความ (`status` / `alert`)
 - **ส่งให้คนที่ 1:** `Organizer` model + `User::activities()`
 - **รับจากคนที่ 2:** `SearchableController`, CSS class, โครง CategoryController / views เพื่อทำ Organizer
-- **รับจากคนที่ 1:** `ActivityController::filter()` (ยืมผ่าน `\resolve()`) สำหรับ `organizers.view-activities` (ตารางเขียนเองในไฟล์ แบบ `view-products` ในคาบ), `Activity::isOpen()` / `isFull()` สำหรับการ์ดหน้าแรก
+- **รับจากคนที่ 1:** `ActivityController::filter()` (ยืมผ่าน `\resolve()`) สำหรับ `organizers.view-activities` (ตารางเขียนเองในไฟล์ แบบ `view-products` ในคาบ)
 
 ## Checklist ว่างานเสร็จ
 
@@ -98,8 +98,8 @@ Branch: `member-3/organizers-accounts`
 - [ ] เข้าหน้าที่ต้อง login ตอนยังไม่ login → ไป login → login แล้วกลับมาหน้าเดิม (`intended`)
 - [ ] สมัครสมาชิกได้ แล้ว login ให้อัตโนมัติ · ในฐานข้อมูล role = `USER` แม้ส่ง `role=ADMIN` มาเอง
 - [ ] สมัครด้วยอีเมลซ้ำ → กล่องแดง `Duplicate entry ...` · ช่องชื่อ/อีเมลยังมีค่า ช่องรหัสผ่านว่าง
-- [ ] login แล้วเปิด `/auth/login` หรือ `/auth/register` → ถูกพาไปหน้าแรก
-- [ ] Guest เปิดหน้าแรกได้ · เมนูแสดง "เข้าสู่ระบบ / สมัครสมาชิก" · USER เห็น "กิจกรรมของฉัน", "หมวดหมู่", "ผู้จัด" · ADMIN เห็น "หมวดหมู่ / ผู้จัด" (ไม่มี "กิจกรรมของฉัน")
+- [ ] login แล้วเปิด `/auth/login` หรือ `/auth/register` → ถูกพาไปหน้ารายการกิจกรรม
+- [ ] Guest เปิด `/` แล้วเห็นหน้ารายการกิจกรรม · เมนูแสดง "เข้าสู่ระบบ / สมัครสมาชิก" · USER เห็น "กิจกรรมของฉัน", "หมวดหมู่", "ผู้จัด" · ADMIN เห็น "หมวดหมู่ / ผู้จัด" (ไม่มี "กิจกรรมของฉัน")
 - [ ] ADMIN สร้าง / ดู / แก้ / ลบ Organizer ได้ · OG001 ลบไม่ได้ · OG004 ลบได้
 - [ ] USER เห็นเมนูผู้จัด ดูได้แต่ไม่มีปุ่มแก้ · พิมพ์ `/organizers/create` เองได้ 403
 - [ ] USER เห็นกิจกรรมของฉันถูกต้องทั้ง 2 แท็บ · ADMIN เปิด `/my-activities` ได้ 403

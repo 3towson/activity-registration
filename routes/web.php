@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -11,8 +10,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware([
     'cache.headers:no_store;no_cache;must_revalidate;max_age=0',
 ])->group(static function (): void {
-    // หน้าแรก (public)
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+    // หน้าแรกคือหน้ารายการกิจกรรม (public)
+    Route::get('/', static fn() => redirect()->route('activities.list'))->name('home');
 
     require __DIR__ . '/auth.php';           // คนที่ 3: login / logout (+ สมัครสมาชิกในขั้นที่ 2)
     require __DIR__ . '/activities.php';     // คนที่ 1: กิจกรรม + สมัคร/ยกเลิก
