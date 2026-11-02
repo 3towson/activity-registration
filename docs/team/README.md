@@ -20,9 +20,9 @@
 
 ## ขั้นที่ 0 — เตรียมเครื่อง (ทุกคน ทำที่บ้าน)
 
-- [ ] PHP **8.3 ขึ้นไป** เปิด extension `pdo_mysql`, `mbstring`, `gd`, `dom` (ทุกเครื่องควรเวอร์ชันเดียวกัน → รัน `php -v` แล้วแจ้งในกลุ่ม)
+- [ ] PHP **8.4.1 ขึ้นไป** เปิด extension `pdo_mysql`, `mbstring`, `gd`, `dom` (ทุกเครื่องควรเวอร์ชันเดียวกัน → รัน `php -v` แล้วแจ้งในกลุ่ม)
 - [ ] Composer (`composer -V`)
-- [ ] MySQL / MariaDB เช่น XAMPP (⚠️ XAMPP บางเวอร์ชันมากับ PHP 8.2 ซึ่งใช้กับ Laravel 13 ไม่ได้ — ใช้ XAMPP เฉพาะ MySQL แล้วลง PHP แยก ดูวิธีใน [README หลัก](../../README.md#ขั้นที่-0--เตรียมเครื่อง-ทุกคน-ทำที่บ้าน))
+- [ ] MySQL / MariaDB เช่น XAMPP (⚠️ XAMPP บางเวอร์ชันมากับ PHP ที่ต่ำกว่า 8.4.1 ซึ่งใช้กับโปรเจกต์นี้ไม่ได้ — ใช้ XAMPP เฉพาะ MySQL แล้วลง PHP แยก ดูวิธีใน [README หลัก](../../README.md#ขั้นที่-0--เตรียมเครื่อง-ทุกคน-ทำที่บ้าน))
 - [ ] สร้างฐานข้อมูลใน phpMyAdmin:
   ```sql
   CREATE DATABASE activity_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

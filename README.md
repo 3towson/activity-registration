@@ -9,11 +9,11 @@ Term Project วิชา 954348 — ภาคเรียน 1/2569 · Laravel 
 
 ## ขั้นที่ 0 — เตรียมเครื่อง (ทุกคน ทำที่บ้าน)
 
-### 0.1 PHP 8.3 ขึ้นไป + Composer
+### 0.1 PHP 8.4.1 ขึ้นไป + Composer
 
-Laravel 13 ต้องใช้ **PHP 8.3 ขึ้นไป** — ⚠️ XAMPP บางเวอร์ชันมากับ PHP 8.2 ซึ่ง **ใช้ไม่ได้** ให้เช็ก `php -v` ก่อน
+โปรเจกต์นี้ต้องใช้ **PHP 8.4.1 ขึ้นไป** เพราะแพ็กเกจ Symfony ใน `composer.lock` ต้องการเวอร์ชันนี้ — ⚠️ XAMPP บางเวอร์ชันมากับ PHP ที่ต่ำกว่านี้ ซึ่ง **ใช้ไม่ได้** ให้เช็ก `php -v` ก่อน
 
-ถ้ายังไม่มี PHP 8.3+ ใช้ตัวติดตั้งทางการของ Laravel (ได้ PHP 8.5 + Composer + Laravel installer):
+ถ้ายังไม่มี PHP 8.4.1+ ใช้ตัวติดตั้งทางการของ Laravel (ได้ PHP 8.5 + Composer + Laravel installer):
 
 ```powershell
 # Windows PowerShell (เปิดแบบ Administrator)
@@ -28,7 +28,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 ปิดแล้วเปิด terminal ใหม่ แล้วเช็ก:
 
 ```bash
-php -v          # ต้องได้ 8.3 ขึ้นไป
+php -v          # ต้องได้ 8.4.1 ขึ้นไป
 composer -V
 php -m          # ต้องมี pdo_mysql, mbstring, openssl, fileinfo
 ```
@@ -107,7 +107,7 @@ php artisan serve               # เปิด http://127.0.0.1:8000
 | `Access denied for user 'root'` | แก้ `DB_USERNAME` / `DB_PASSWORD` ใน `.env` แล้วรัน `php artisan config:clear` |
 | `Unknown database 'activity_db'` | ยังไม่ได้สร้างฐานข้อมูล (ข้อ 0.2) |
 | ภาษาไทยเป็น `???` ในฐานข้อมูล | ฐานข้อมูลไม่ใช่ `utf8mb4` → ลบแล้วสร้างใหม่ตามข้อ 0.2 แล้ว `migrate:fresh --seed` |
-| `Your requirements could not be resolved ... php ^8.3` | PHP ต่ำกว่า 8.3 → ทำข้อ 0.1 |
+| `Your requirements could not be resolved ...` หรือ `Your lock file does not contain a compatible set of packages` ที่พูดถึง `php` | PHP ต่ำกว่า 8.4.1 → ทำข้อ 0.1 |
 | `No application encryption key` | `php artisan key:generate` |
 
 ---

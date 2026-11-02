@@ -447,7 +447,7 @@ body { font-family: 'Sarabun', sans-serif; }
 
 | ขั้น | งาน | ใคร |
 |---|---|---|
-| 0 | เตรียมเครื่อง: PHP 8.3+, Composer, XAMPP, สร้าง `activity_db` (utf8mb4) | ทุกคน |
+| 0 | เตรียมเครื่อง: PHP 8.4.1+, Composer, XAMPP, สร้าง `activity_db` (utf8mb4) | ทุกคน |
 | 1 | ฐานร่วม (ดูข้อ 12 และ `docs/team/README.md`) | ทุกคน ทำพร้อมกัน |
 | 2 | แยกกันทำใน Git branch ของตัวเอง | แต่ละคน |
 | 3 | merge เข้า `main` ทีละส่วนเมื่อเสร็จ | แต่ละคน |
@@ -460,7 +460,7 @@ body { font-family: 'Sarabun', sans-serif; }
 | รายการ | ค่า |
 |---|---|
 | Laravel | 13.x |
-| PHP | 8.3 ขึ้นไป (โค้ดไม่ใช้ `array_last()` จึงไม่ต้องใช้ 8.5) — ทุกเครื่องควรตรงกัน |
+| PHP | 8.4.1 ขึ้นไป (แพ็กเกจ Symfony ใน `composer.lock` ต้องการ · โค้ดไม่ใช้ `array_last()` จึงไม่ต้องใช้ 8.5) — ทุกเครื่องควรตรงกัน |
 | Database | MySQL 8 / MariaDB 10.6+ (utf8mb4) — ทดสอบแล้วบน MariaDB 10.11 |
 
 **บัญชีทดสอบ** (สร้างใน seeder)
