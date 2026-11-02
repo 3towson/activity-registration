@@ -19,12 +19,17 @@ class MyActivityController extends Controller
 
         $showPast = ($request->getQueryParams()['tab'] ?? '') === 'past';
 
-        // กำลังจะมาถึง: ใกล้สุดขึ้นก่อน · ที่ผ่านมาแล้ว: ล่าสุดขึ้นก่อน
-        $query = $user->activities()
-            ->with(['category', 'organizer'])
-            ->whereDate('date', $showPast ? '<' : '>=', today())
-            ->orderBy('date', $showPast ? 'desc' : 'asc')
-            ->orderBy('code');
+        $query = $user->activities()->with(['category', 'organizer']);
+
+        if ($showPast) {
+            // ที่ผ่านมาแล้ว: ล่าสุดขึ้นก่อน
+            $query->whereDate('date', '<', today())->orderBy('date', 'desc');
+        } else {
+            // กำลังจะมาถึง: ใกล้สุดขึ้นก่อน
+            $query->whereDate('date', '>=', today())->orderBy('date', 'asc');
+        }
+
+        $query->orderBy('code');
 
         return view('my-activities.list', [
             'showPast' => $showPast,
