@@ -32,7 +32,7 @@ class LoginController extends Controller
 
                 // กลับไปหน้าที่ตั้งใจจะเข้าก่อนถูกพามา login
                 return redirect()
-                    ->intended(route('home'))
+                    ->intended(route('activities.list'))
                     ->with('status', 'เข้าสู่ระบบสำเร็จ ยินดีต้อนรับ ' . Auth::user()->name);
             }
 
