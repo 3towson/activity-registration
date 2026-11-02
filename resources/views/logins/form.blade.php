@@ -28,9 +28,6 @@
             <button type="submit" class="app-cl-button app-cl-filled app-cl-primary">เข้าสู่ระบบ</button>
         </div>
 
-        {{-- หน้าสมัครสมาชิกเป็นงานของคนที่ 3 ในขั้นที่ 2 — ลิงก์จะโผล่เองเมื่อมี route ชื่อ register-form --}}
-        @if (Route::has('register-form'))
-            <p class="app-cmp-hint">ยังไม่มีบัญชี? <a href="{{ route('register-form') }}">สมัครสมาชิก</a></p>
-        @endif
+        <p class="app-cmp-hint">ยังไม่มีบัญชี? <a href="{{ route('register-form') }}">สมัครสมาชิก</a></p>
     </form>
 @endsection

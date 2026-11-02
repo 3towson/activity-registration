@@ -1,75 +1,69 @@
 @extends('layouts.main', [
-    'title' => 'ตรวจฐานร่วม',
+    'title' => 'ยินดีต้อนรับ',
 ])
 
-{{-- หน้าชั่วคราวสำหรับตรวจว่าฐานร่วมใช้ได้ — คนที่ 3 จะเปลี่ยนเป็นหน้าแรกจริงในขั้นที่ 2 --}}
-
 @section('header')
-    <p class="app-cmp-lead">
-        ถ้าหน้านี้แสดงตัวเลขครบและ login เป็นผู้ดูแล / สมาชิกได้ แปลว่าฐานร่วมพร้อม แยกกันทำต่อได้เลย
-    </p>
+    <p class="app-cmp-lead">ค้นหากิจกรรมที่สนใจ แล้วสมัครเข้าร่วมได้ในไม่กี่ขั้นตอน</p>
+
+    <div class="app-cmp-links-bar">
+        <a href="{{ route('activities.index') }}" class="app-cl-button app-cl-filled app-cl-primary">ดูกิจกรรมทั้งหมด</a>
+
+        @foreach ($categories as $category)
+            <a href="{{ route('activities.list', ['category' => $category->code]) }}"
+                class="app-cl-button">{{ $category->name }}</a>
+        @endforeach
+    </div>
 @endsection
 
 @section('content')
     <section class="app-cmp-section">
-        <h2>จำนวนข้อมูลในฐานข้อมูล</h2>
-        <table class="app-cmp-data-list">
-            <thead>
-                <tr><th>ตาราง</th><th class="app-cl-number">จำนวน</th><th class="app-cl-number">ควรได้</th></tr>
-            </thead>
-            <tbody>
-                @foreach (['users' => 6, 'categories' => 4, 'organizers' => 4, 'activities' => 12, 'activity_user' => 15] as $table => $expected)
-                    <tr>
-                        <th>{{ $table }}</th>
-                        <td class="app-cl-number">{{ $counts[$table] }}</td>
-                        <td class="app-cl-number">{{ $expected }} {{ $counts[$table] === $expected ? '✓' : '✗' }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </section>
+        <h2>กิจกรรมที่ใกล้จะจัด</h2>
 
-    <section class="app-cmp-section">
-        <h2>สถานะการ login</h2>
-        @auth
-            <p>
-                เข้าสู่ระบบเป็น <strong>{{ \Auth::user()->name }}</strong> ({{ \Auth::user()->email }})
-                — role <strong>{{ \Auth::user()->role }}</strong>
-                · สมัครไว้ {{ \Auth::user()->activities()->count() }} กิจกรรม
-            </p>
+        @php
+            session()->put('bookmarks.activities.view', url()->full());
+        @endphp
+
+        @if ($activities->isEmpty())
+            <p>ยังไม่มีกิจกรรมที่กำลังจะจัด</p>
         @else
-            <p>
-                ยังไม่ได้เข้าสู่ระบบ — <a href="{{ route('login') }}">ลอง login</a> ด้วย
-                <code>admin@activity.test</code> หรือ <code>user@activity.test</code> (รหัส <code>1234</code>)
-            </p>
-        @endauth
+            <div class="app-cmp-activity-cards">
+                @foreach ($activities as $activity)
+                    <article class="app-cmp-activity-card">
+                        @if ($activity->isFull())
+                            <span class="app-cmp-status app-cl-full">เต็มแล้ว</span>
+                        @else
+                            <span class="app-cmp-status app-cl-open">เปิดรับ</span>
+                        @endif
+
+                        <h3>{{ $activity->name }}</h3>
+                        <p>{{ $activity->date->format('d/m/Y') }} · {{ $activity->location }}</p>
+                        <p>{{ $activity->category->name }} · {{ $activity->organizer->name }}</p>
+                        <p>สมัครแล้ว {{ $activity->participants_count }} / {{ $activity->capacity }} คน</p>
+
+                        <footer>
+                            <a href="{{ route('activities.view', ['activity' => $activity->code]) }}"
+                                class="app-cl-button">ดูรายละเอียด</a>
+                        </footer>
+                    </article>
+                @endforeach
+            </div>
+        @endif
     </section>
 
     <section class="app-cmp-section">
-        <h2>กิจกรรมตัวอย่าง (ทดสอบ relationships)</h2>
-        <table class="app-cmp-data-list">
-            <thead>
-                <tr>
-                    <th>รหัส</th>
-                    <th>ชื่อกิจกรรม</th>
-                    <th>หมวดหมู่ <small>category()</small></th>
-                    <th>ผู้จัด <small>organizer()</small></th>
-                    <th>วันที่จัด</th>
-                    <th class="app-cl-number">สมัคร / รับ <small>participants()</small></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($activities as $activity)
-                    <tr>
-                        <th class="app-cl-code">{{ $activity->code }}</th>
-                        <td>{{ $activity->name }}</td>
-                        <td>{{ $activity->category->name }}</td>
-                        <td>{{ $activity->organizer->name }}</td>
-                        <td class="app-cl-nowrap">{{ $activity->date->translatedFormat('j M Y') }}</td>
-                        <td class="app-cl-number">{{ $activity->participants_count }} / {{ $activity->capacity }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+        <h2>ตัวเลขสรุป</h2>
+        <dl class="app-cmp-data-detail">
+            <dt>กิจกรรมทั้งหมด</dt>
+            <dd>{{ $counts['activities'] }}</dd>
+
+            <dt>กิจกรรมที่กำลังจะจัด</dt>
+            <dd>{{ $counts['upcoming'] }}</dd>
+
+            <dt>หมวดหมู่</dt>
+            <dd>{{ $counts['categories'] }}</dd>
+
+            <dt>ผู้จัด</dt>
+            <dd>{{ $counts['organizers'] }}</dd>
+        </dl>
     </section>
 @endsection

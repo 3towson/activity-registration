@@ -47,4 +47,9 @@ class ActivityPolicy
         return $user->isMember() && $activity->isOpen()
             && $activity->participants()->whereKey($user->id)->exists();
     }
+
+    public function viewMine(User $user): bool
+    {
+        return $user->isMember();
+    }
 }

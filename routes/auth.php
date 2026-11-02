@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Route;
 
 // เจ้าของ: คนที่ 3
@@ -13,9 +14,10 @@ Route::prefix('/auth')->group(static function (): void {
             Route::post('/login', 'authenticate')->name('authentication');
         });
 
-        // TODO (คนที่ 3, ขั้นที่ 2): สมัครสมาชิก
-        // Route::get('/register', [RegisterController::class, 'showForm'])->name('register-form');
-        // Route::post('/register', [RegisterController::class, 'register'])->name('register');
+        Route::controller(RegisterController::class)->group(static function (): void {
+            Route::get('/register', 'showForm')->name('register-form');
+            Route::post('/register', 'register')->name('register');
+        });
     });
 
     Route::post('/logout', [LoginController::class, 'logout'])

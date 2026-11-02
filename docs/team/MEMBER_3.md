@@ -36,7 +36,7 @@ Branch: `member-3/organizers-accounts`
    - ฟอร์ม: อีเมล (`type="email"`), รหัสผ่าน, ชื่อ — ทุกช่อง `required` · ไม่มีช่องเลือก role
    - ใน `try`: `new User($data)` แล้ว `$user->email = $data['email']`, `$user->role = 'USER'` (**ต่างจากคาบ: ล็อกเป็น USER เสมอ ห้ามรับ role จากฟอร์ม** แม้มีคนแอบส่ง `role=ADMIN` มา) แล้ว `save()`
    - อีเมลซ้ำ → `QueryException` → กล่องแดง `Duplicate entry ...` · คืนค่าฟอร์มด้วย `withInput()` แต่ **ไม่คืนรหัสผ่าน**
-   - `Auth::login($user)` + `session()->regenerate()` แล้วพาไปหน้ารายการกิจกรรม
+   - `Auth::attempt()` (แบบ `LoginController`) + `session()->regenerate()` แล้วพาไปหน้ารายการกิจกรรม
    - หน้า login / สมัครสมาชิกใช้ middleware `guest` (login แล้วเข้าไม่ได้)
 3. **หน้าแรก (public)** — กิจกรรมที่ใกล้จะจัด 6 รายการ (การ์ด), ตัวเลขสรุป, ปุ่มหมวดหมู่ที่ลิงก์ไป `activities.list?category=...`
 4. **กิจกรรมของฉัน (USER)** — `$user->activities()` แยกแท็บ "กำลังจะมาถึง" / "ที่ผ่านมาแล้ว" · มีลิงก์บัตร PDF · ADMIN เข้าแล้วได้ 403
