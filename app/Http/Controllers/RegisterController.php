@@ -29,7 +29,8 @@ class RegisterController extends Controller
             $user->role = User::ROLE_USER;
             $user->save();
 
-            Auth::login($user);
+            // login แบบเดียวกับ LoginController — บันทึกสำเร็จแล้ว อีเมลและรหัสผ่านจึงมีค่าแน่นอน
+            Auth::attempt(['email' => $data['email'], 'password' => $data['password']]);
 
             // สร้าง session ID ใหม่ กัน session fixation
             session()->regenerate();
